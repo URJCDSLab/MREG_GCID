@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES" xml:lang="es-ES"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.21">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>1&nbsp; Regresión Lineal Simple – Problemas de Modelos Estadísticos para la Predicción</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./tema2_regresion_multiple_soluciones.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea1d7ac60288e0f1efdbc993fd8432ae.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-0687a6949ae11671cfb8b930681aab34.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="soluciones.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tema1_regresion_simple_soluciones.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Regresión Lineal Simple</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Problemas de Modelos Estadísticos para la Predicción</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefacio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tema1_regresion_simple_soluciones.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Regresión Lineal Simple</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tema2_regresion_multiple_soluciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresión Lineal Múltiple</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tema3_ingenieria_caracteristicas_soluciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Ingeniería de Características</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tema4_seleccion_validacion_soluciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Selección de variables, Regularización y Validación</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tema5_glm_soluciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Modelos de Regresión Generalizada</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ejercicios_avanzados_soluciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Ejercicios Avanzados</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#ejercicio-1-fundamentos-conceptuales" id="toc-ejercicio-1-fundamentos-conceptuales" class="nav-link active" data-scroll-target="#ejercicio-1-fundamentos-conceptuales"><span class="header-section-number">1.1</span> Ejercicio 1: Fundamentos Conceptuales</a></li>
+  <li><a href="#ejercicio-2-interpretación-de-coeficientes" id="toc-ejercicio-2-interpretación-de-coeficientes" class="nav-link" data-scroll-target="#ejercicio-2-interpretación-de-coeficientes"><span class="header-section-number">1.2</span> Ejercicio 2: Interpretación de Coeficientes</a>
+  <ul class="collapse">
+  <li><a href="#ejercicio-3-aplicación-práctica-con-r-ajuste-e-inferencia" id="toc-ejercicio-3-aplicación-práctica-con-r-ajuste-e-inferencia" class="nav-link" data-scroll-target="#ejercicio-3-aplicación-práctica-con-r-ajuste-e-inferencia"><span class="header-section-number">1.2.1</span> Ejercicio 3: Aplicación Práctica con R (Ajuste e Inferencia)</a></li>
+  <li><a href="#ejercicio-4-intervalos-de-confianza-y-predicción" id="toc-ejercicio-4-intervalos-de-confianza-y-predicción" class="nav-link" data-scroll-target="#ejercicio-4-intervalos-de-confianza-y-predicción"><span class="header-section-number">1.2.2</span> Ejercicio 4: Intervalos de Confianza y Predicción</a></li>
+  <li><a href="#ejercicio-5-supuestos-del-modelo" id="toc-ejercicio-5-supuestos-del-modelo" class="nav-link" data-scroll-target="#ejercicio-5-supuestos-del-modelo"><span class="header-section-number">1.2.3</span> Ejercicio 5: Supuestos del Modelo</a></li>
+  <li><a href="#ejercicio-6-diagnóstico-de-linealidad-y-homocedasticidad" id="toc-ejercicio-6-diagnóstico-de-linealidad-y-homocedasticidad" class="nav-link" data-scroll-target="#ejercicio-6-diagnóstico-de-linealidad-y-homocedasticidad"><span class="header-section-number">1.2.4</span> Ejercicio 6: Diagnóstico de Linealidad y Homocedasticidad</a></li>
+  <li><a href="#ejercicio-7-diagnóstico-de-normalidad" id="toc-ejercicio-7-diagnóstico-de-normalidad" class="nav-link" data-scroll-target="#ejercicio-7-diagnóstico-de-normalidad"><span class="header-section-number">1.2.5</span> Ejercicio 7: Diagnóstico de Normalidad</a></li>
+  <li><a href="#ejercicio-8-descomposición-de-la-varianza-anova" id="toc-ejercicio-8-descomposición-de-la-varianza-anova" class="nav-link" data-scroll-target="#ejercicio-8-descomposición-de-la-varianza-anova"><span class="header-section-number">1.2.6</span> Ejercicio 8: Descomposición de la Varianza (ANOVA)</a></li>
+  <li><a href="#ejercicio-9-observaciones-influyentes" id="toc-ejercicio-9-observaciones-influyentes" class="nav-link" data-scroll-target="#ejercicio-9-observaciones-influyentes"><span class="header-section-number">1.2.7</span> Ejercicio 9: Observaciones Influyentes</a></li>
+  <li><a href="#ejercicio-10-relación-entre-pruebas-de-hipótesis" id="toc-ejercicio-10-relación-entre-pruebas-de-hipótesis" class="nav-link" data-scroll-target="#ejercicio-10-relación-entre-pruebas-de-hipótesis"><span class="header-section-number">1.2.8</span> Ejercicio 10: Relación entre Pruebas de Hipótesis</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Regresión Lineal Simple</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>En este capítulo encontrarás las soluciones detalladas a todos los ejercicios del Tema 1. Cada ejercicio incluye tanto el enunciado como la solución completa con código R y explicaciones teóricas.</p>
+<section id="ejercicio-1-fundamentos-conceptuales" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="ejercicio-1-fundamentos-conceptuales"><span class="header-section-number">1.1</span> Ejercicio 1: Fundamentos Conceptuales</h2>
+<p>Basándote en el texto, explica con tus propias palabras por qué un coeficiente de correlación de Pearson (<span class="math inline">\(r\)</span>) alto no es suficiente para modelar una relación y por qué la regresión lineal es un paso más allá. Menciona al menos dos cosas que el modelo de regresión proporciona y que la correlación por sí sola no ofrece.</p>
+<details>
+<summary>
+</summary>
+<p>La correlación de Pearson (<span class="math inline">\(r\)</span>) solo mide la <strong>fuerza y dirección</strong> de una relación lineal entre dos variables, pero no es suficiente para modelar porque:</p>
+<ol type="1">
+<li><p><strong>No proporciona un modelo predictivo</strong>: La correlación solo nos dice qué tan relacionadas están las variables, pero no nos permite hacer predicciones específicas sobre una variable a partir de la otra.</p></li>
+<li><p><strong>No cuantifica el cambio</strong>: No nos dice cuánto cambia una variable cuando la otra cambia en una unidad específica.</p></li>
+</ol>
+<p>La regresión lineal va más allá porque proporciona:</p>
+<ol type="1">
+<li><p><strong>Capacidad predictiva</strong>: Permite predecir valores específicos de la variable dependiente para valores dados de la independiente.</p></li>
+<li><p><strong>Cuantificación del cambio</strong>: Los coeficientes nos dicen exactamente cuánto cambia Y por cada unidad de cambio en X.</p></li>
+<li><p><strong>Intervalos de confianza y predicción</strong>: Permite cuantificar la incertidumbre de nuestras estimaciones.</p></li>
+<li><p><strong>Marco para inferencia estadística</strong>: Permite realizar pruebas de hipótesis sobre la significancia de la relación.</p></li>
+</ol>
+</details>
+</section>
+<section id="ejercicio-2-interpretación-de-coeficientes" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="ejercicio-2-interpretación-de-coeficientes"><span class="header-section-number">1.2</span> Ejercicio 2: Interpretación de Coeficientes</h2>
+<p>Un analista ajusta un modelo para predecir el gasto anual en compras online (<code>gasto</code>, en euros) basándose en la edad del cliente (<code>edad</code>). El modelo ajustado es:</p>
+<p><code>gasto = 1500 + 12 * edad</code></p>
+<ol type="a">
+<li>¿Cuál es el gasto predicho para un cliente de 30 años?</li>
+<li>Interpreta el significado de la pendiente (12) en el contexto específico de este problema.</li>
+<li>Interpreta el significado del intercepto (1500). ¿Crees que esta interpretación tiene sentido práctico en el mundo real? ¿Por qué?</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Gasto predicho para un cliente de 30 años:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cálculo directo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>gasto_30 <span class="ot">=</span> <span class="dv">1500</span> <span class="sc">+</span> <span class="dv">12</span> <span class="sc">*</span> <span class="dv">30</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Gasto predicho:"</span>, gasto_30, <span class="st">"euros"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Gasto predicho: 1860 euros"</code></pre>
+</div>
+</div>
+<p><strong>b) Interpretación de la pendiente (12):</strong> Por cada año adicional de edad del cliente, se espera que el gasto anual en compras online aumente en 12 euros, manteniendo todo lo demás constante.</p>
+<p><strong>c) Interpretación del intercepto (1500):</strong> Representa el gasto predicho para un cliente de 0 años, que sería 1500 euros. <strong>Esta interpretación NO tiene sentido práctico</strong> porque:</p>
+<ul>
+<li>No existen clientes de 0 años</li>
+<li>Estamos extrapolando fuera del rango de datos observados</li>
+<li>El modelo probablemente no es válido para edades tan bajas</li>
+</ul>
+</details>
+<section id="ejercicio-3-aplicación-práctica-con-r-ajuste-e-inferencia" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="ejercicio-3-aplicación-práctica-con-r-ajuste-e-inferencia"><span class="header-section-number">1.2.1</span> Ejercicio 3: Aplicación Práctica con R (Ajuste e Inferencia)</h3>
+<p>Utiliza el conjunto de datos <code>pressure</code> de R, que contiene mediciones de temperatura y presión de vapor de mercurio.</p>
+<ol type="a">
+<li>Ajusta un modelo de regresión lineal simple para predecir la presión (<code>pressure</code>) en función de la temperatura (<code>temperature</code>). Guarda el modelo en un objeto.</li>
+<li>Utiliza la función <code>summary()</code> sobre el objeto del modelo.</li>
+<li>Interpreta el valor del <strong>coeficiente de determinación R²</strong>. ¿Qué porcentaje de la variabilidad de la presión es explicado por la temperatura?</li>
+<li>Interpreta el <strong>p-valor del estadístico F</strong>. ¿Es el modelo útil en su conjunto?</li>
+<li>¿Es el coeficiente de la temperatura estadísticamente significativo a un nivel de <span class="math inline">\(\alpha = 0.05\)</span>? Justifica tu respuesta basándote en el p-valor del test t.</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Ajustar el modelo:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>modelo_pressure <span class="ot">&lt;-</span> <span class="fu">lm</span>(pressure <span class="sc">~</span> temperature, <span class="at">data =</span> pressure)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>b) Summary del modelo:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_pressure)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = pressure ~ temperature, data = pressure)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-158.08 -117.06  -32.84   72.30  409.43 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -147.8989    66.5529  -2.222 0.040124 *  
+temperature    1.5124     0.3158   4.788 0.000171 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 150.8 on 17 degrees of freedom
+Multiple R-squared:  0.5742,    Adjusted R-squared:  0.5492 
+F-statistic: 22.93 on 1 and 17 DF,  p-value: 0.000171</code></pre>
+</div>
+</div>
+<p><strong>c), d) y e) Interpretación de la Salida del Modelo</strong></p>
+<p>La forma más eficiente de analizar el modelo es observar directamente la salida de la función <code>summary()</code>.</p>
+<p>A partir de esta salida, interpretamos:</p>
+<p><strong>c) Coeficiente de determinación R²</strong>: El valor de <code>Multiple R-squared</code> es <strong>0.5742</strong>. Esto significa que la temperatura explica el <strong>57.42%</strong> de la variabilidad en la presión.</p>
+<p><strong>d) p-valor del estadístico F</strong>: En la última línea, el <code>p-value</code> del <code>F-statistic</code> es <strong>0.000171</strong>. Al ser un valor muy inferior a 0.05, rechazamos la hipótesis nula (<span class="math inline">\(H_0\)</span>) de que el modelo no tiene capacidad predictiva. Concluimos que <strong>el modelo es globalmente significativo</strong>.</p>
+<p><strong>e) Significancia del coeficiente</strong>: En la tabla de coeficientes, el p-valor (<code>Pr(&gt;|t|)</code>) para <code>temperature</code> es <strong>0.000171</strong>. Rechazamos la hipótesis nula (<span class="math inline">\(H_0: \beta_1 = 0\)</span>) y concluimos que la temperatura tiene una <strong>relación estadísticamente significativa</strong> con la presión.</p>
+</details>
+</section>
+<section id="ejercicio-4-intervalos-de-confianza-y-predicción" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="ejercicio-4-intervalos-de-confianza-y-predicción"><span class="header-section-number">1.2.2</span> Ejercicio 4: Intervalos de Confianza y Predicción</h3>
+<p>Usando el modelo del ejercicio anterior (<code>lm(pressure ~ temperature, data = pressure)</code>):</p>
+<ol type="a">
+<li>Calcula el <strong>intervalo de confianza al 95%</strong> para la <em>presión media</em> esperada cuando la temperatura es de 250 grados.</li>
+<li>Calcula el <strong>intervalo de predicción al 95%</strong> para la presión de una <em>única y nueva</em> medición realizada a 250 grados.</li>
+<li>¿Cuál de los dos intervalos es más ancho? Explica la razón teórica de esta diferencia.</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Intervalo de confianza para la media cuando temp = 250:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ic_mean <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_pressure, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">temperature =</span> <span class="dv">250</span>), </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">interval =</span> <span class="st">"confidence"</span>, <span class="at">level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Intervalo de confianza (95%) para la presión media:"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Intervalo de confianza (95%) para la presión media:"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ic_mean)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       fit      lwr      upr
+1 230.2061 143.5771 316.8351</code></pre>
+</div>
+</div>
+<p><strong>b) Intervalo de predicción para una nueva observación:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ic_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_pressure, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">temperature =</span> <span class="dv">250</span>), </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">interval =</span> <span class="st">"prediction"</span>, <span class="at">level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Intervalo de predicción (95%) para una nueva observación:"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Intervalo de predicción (95%) para una nueva observación:"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(ic_pred)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       fit      lwr      upr
+1 230.2061 -99.5663 559.9785</code></pre>
+</div>
+</div>
+<p><strong>c) Comparación de anchos:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ancho_conf <span class="ot">&lt;-</span> ic_mean[<span class="dv">3</span>] <span class="sc">-</span> ic_mean[<span class="dv">2</span>]</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ancho_pred <span class="ot">&lt;-</span> ic_pred[<span class="dv">3</span>] <span class="sc">-</span> ic_pred[<span class="dv">2</span>]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Ancho intervalo confianza:"</span>, <span class="fu">round</span>(ancho_conf, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Ancho intervalo confianza: 173.26"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Ancho intervalo predicción:"</span>, <span class="fu">round</span>(ancho_pred, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Ancho intervalo predicción: 659.54"</code></pre>
+</div>
+</div>
+<p>Una visualización ayuda a entender la diferencia al instante:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear gráfico con bandas de confianza y predicción</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>temp_range <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(pressure<span class="sc">$</span>temperature), <span class="fu">max</span>(pressure<span class="sc">$</span>temperature), <span class="at">length.out =</span> <span class="dv">100</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>conf_bands <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_pressure, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">temperature =</span> temp_range), </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">interval =</span> <span class="st">"confidence"</span>, <span class="at">level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>pred_bands <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_pressure, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">temperature =</span> temp_range), </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">interval =</span> <span class="st">"prediction"</span>, <span class="at">level =</span> <span class="fl">0.95</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pressure<span class="sc">$</span>temperature, pressure<span class="sc">$</span>pressure, </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Temperatura"</span>, <span class="at">ylab =</span> <span class="st">"Presión"</span>, </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Intervalos de Confianza vs Predicción"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(modelo_pressure, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(temp_range, conf_bands[,<span class="st">"lwr"</span>], <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(temp_range, conf_bands[,<span class="st">"upr"</span>], <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(temp_range, pred_bands[,<span class="st">"lwr"</span>], <span class="at">col =</span> <span class="st">"green"</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(temp_range, pred_bands[,<span class="st">"upr"</span>], <span class="at">col =</span> <span class="st">"green"</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Regresión"</span>, <span class="st">"Confianza"</span>, <span class="st">"Predicción"</span>), </span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"blue"</span>, <span class="st">"green"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tema1_regresion_simple_soluciones_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En el gráfico, las bandas de <strong>confianza</strong> (las más internas) definen el rango probable para la <em>media</em> de la presión a una temperatura dada. Las bandas de <strong>predicción</strong> (las más externas y anchas) definen el rango probable para una <em>única observación futura</em> de presión.</p>
+<p><strong>c) ¿Cuál es más ancho?</strong></p>
+<p>El <strong>intervalo de predicción es más ancho</strong> porque incluye dos fuentes de incertidumbre:</p>
+<ol type="1">
+<li>La incertidumbre sobre la media poblacional (como en el intervalo de confianza)</li>
+<li>La variabilidad natural de las observaciones individuales alrededor de esa media</li>
+</ol>
+</details>
+</section>
+<section id="ejercicio-5-supuestos-del-modelo" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="ejercicio-5-supuestos-del-modelo"><span class="header-section-number">1.2.3</span> Ejercicio 5: Supuestos del Modelo</h3>
+<p>Enumera los cuatro supuestos del modelo de regresión lineal clásico (también conocidos como supuestos de Gauss-Markov) y explica brevemente la importancia de cada uno.</p>
+<details>
+<summary>
+</summary>
+<p>Los <strong>cuatro supuestos de Gauss-Markov</strong> son:</p>
+<ol type="1">
+<li><p><strong>Linealidad</strong>: La relación entre X e Y es lineal. Importante porque si no se cumple, las predicciones serán sistemáticamente erróneas.</p></li>
+<li><p><strong>Independencia</strong>: Las observaciones son independientes entre sí. Crucial para que los errores estándar sean correctos.</p></li>
+<li><p><strong>Homocedasticidad</strong>: La varianza de los errores es constante. Necesario para que los intervalos de confianza y las pruebas de hipótesis sean válidas.</p></li>
+<li><p><strong>Normalidad de los errores</strong>: Los errores siguen una distribución normal. Importante para la validez de las pruebas de hipótesis y los intervalos de confianza.</p></li>
+</ol>
+</details>
+</section>
+<section id="ejercicio-6-diagnóstico-de-linealidad-y-homocedasticidad" class="level3" data-number="1.2.4">
+<h3 data-number="1.2.4" class="anchored" data-anchor-id="ejercicio-6-diagnóstico-de-linealidad-y-homocedasticidad"><span class="header-section-number">1.2.4</span> Ejercicio 6: Diagnóstico de Linealidad y Homocedasticidad</h3>
+<p>Para el modelo del ejercicio 3:</p>
+<ol type="a">
+<li>Genera y muestra el gráfico de <strong>Residuos vs.&nbsp;Valores Ajustados</strong>. Basándote en este gráfico, ¿se cumple el supuesto de <strong>linealidad</strong>? Explica en qué te basas.</li>
+<li>Genera y muestra el gráfico <strong>Scale-Location</strong>. Basándote en este gráfico, ¿se cumple el supuesto de <strong>homocedasticidad</strong>? Describe el patrón que indicaría un problema de heterocedasticidad.</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Gráfico de Residuos vs.&nbsp;Valores Ajustados:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modelo_pressure, <span class="at">which =</span> <span class="dv">1</span>, <span class="at">main =</span> <span class="st">"Residuos vs. Valores Ajustados"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tema1_regresion_simple_soluciones_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>b) Gráfico Scale-Location:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modelo_pressure, <span class="at">which =</span> <span class="dv">3</span>, <span class="at">main =</span> <span class="st">"Scale-Location"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tema1_regresion_simple_soluciones_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>a) Linealidad</strong>: En el gráfico de residuos vs.&nbsp;valores ajustados, observamos un <strong>patrón curvado</strong> en lugar de una distribución aleatoria alrededor de cero. Esto indica que <strong>NO se cumple perfectamente el supuesto de linealidad</strong>.</p>
+<p><strong>b) Homocedasticidad</strong>: En el gráfico Scale-Location, la línea roja muestra una tendencia creciente, lo que sugiere <strong>heterocedasticidad</strong> (varianza no constante). Un problema de heterocedasticidad se manifestaría como un patrón de embudo o una tendencia clara en este gráfico.</p>
+<section id="y-ahora-qué-pasos-siguientes" class="level4" data-number="1.2.4.1">
+<h4 data-number="1.2.4.1" class="anchored" data-anchor-id="y-ahora-qué-pasos-siguientes"><span class="header-section-number">1.2.4.1</span> <strong>¿Y ahora qué? Pasos Siguientes</strong></h4>
+<p>Un buen análisis no termina al detectar un problema, sino al proponer una solución.</p>
+<ol type="1">
+<li><p><strong>Contexto</strong>: El mal ajuste del modelo tiene una razón física. La relación entre temperatura y presión de vapor no es lineal, sino <strong>exponencial</strong>.</p></li>
+<li><p><strong>Solución</strong>: Para corregirlo, aplicamos una <strong>transformación</strong> para linealizar la relación. La más común es el <strong>logaritmo natural</strong> sobre la variable respuesta.</p></li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Ajustamos un nuevo modelo con log(pressure)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(pressure) <span class="sc">~</span> temperature, <span class="at">data =</span> pressure)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Generamos los nuevos gráficos de diagnóstico</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modelo_log, <span class="at">which =</span> <span class="dv">1</span>) <span class="co"># Linealidad</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modelo_log, <span class="at">which =</span> <span class="dv">3</span>) <span class="co"># Homocedasticidad</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tema1_regresion_simple_soluciones_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Como se puede observar, en los nuevos gráficos el patrón curvado ha desaparecido y la varianza de los residuos es mucho más constante. Esto demuestra cómo el diagnóstico nos lleva a <strong>mejorar y validar nuestro modelo</strong>.</p>
+</section></details>
+</section>
+</section>
+<section id="ejercicio-7-diagnóstico-de-normalidad" class="level3" data-number="1.2.5">
+<h3 data-number="1.2.5" class="anchored" data-anchor-id="ejercicio-7-diagnóstico-de-normalidad"><span class="header-section-number">1.2.5</span> Ejercicio 7: Diagnóstico de Normalidad</h3>
+<p>Para el modelo del ejercicio 3:</p>
+<ol type="a">
+<li>Genera un gráfico <strong>Normal Q-Q</strong> de los residuos. ¿Parecen seguir los residuos una distribución normal?</li>
+<li>Realiza un <strong>test de Shapiro-Wilk</strong> sobre los residuos del modelo. ¿Qué concluyes a partir del p-valor?</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Gráfico Normal Q-Q:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modelo_pressure, <span class="at">which =</span> <span class="dv">2</span>, <span class="at">main =</span> <span class="st">"Normal Q-Q Plot"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tema1_regresion_simple_soluciones_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>b) Test de Shapiro-Wilk:</strong></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>shapiro_test <span class="ot">&lt;-</span> <span class="fu">shapiro.test</span>(<span class="fu">residuals</span>(modelo_pressure))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Test de Shapiro-Wilk para normalidad de residuos:"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Test de Shapiro-Wilk para normalidad de residuos:"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(shapiro_test)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  residuals(modelo_pressure)
+W = 0.89337, p-value = 0.03697</code></pre>
+</div>
+</div>
+<p><strong>a) Q-Q Plot</strong>: Los puntos se desvían considerablemente de la línea diagonal, especialmente en las colas, indicando que los residuos <strong>no siguen una distribución normal</strong>.</p>
+<p><strong>b) Test de Shapiro-Wilk</strong>: Con p-valor &lt; 0.05, <strong>rechazamos la hipótesis nula de normalidad</strong>. Los residuos no son normales.</p>
+<p><strong>Conexión con el Ejercicio 6</strong>: Es importante destacar que la <strong>falta de linealidad</strong> (detectada en el ejercicio anterior) es frecuentemente la <strong>causa raíz de la no normalidad</strong> en los residuos. Al corregir el problema estructural del modelo con la transformación logarítmica, el supuesto de normalidad también mejora de forma significativa.</p>
+</details>
+</section>
+<section id="ejercicio-8-descomposición-de-la-varianza-anova" class="level3" data-number="1.2.6">
+<h3 data-number="1.2.6" class="anchored" data-anchor-id="ejercicio-8-descomposición-de-la-varianza-anova"><span class="header-section-number">1.2.6</span> Ejercicio 8: Descomposición de la Varianza (ANOVA)</h3>
+<p>Explica qué representan la <strong>Suma de Cuadrados Total (SST)</strong>, la <strong>Suma de Cuadrados de la Regresión (SSR)</strong> y la <strong>Suma de Cuadrados del Error (SSE)</strong>. ¿Cuál es la ecuación fundamental que las relaciona?</p>
+<details>
+<summary>
+</summary>
+<ul>
+<li><p><strong>SST (Suma de Cuadrados Total)</strong>: Mide la variabilidad total en Y alrededor de su media. <span class="math inline">\(SST = \sum(y_i - \bar{y})^2\)</span></p></li>
+<li><p><strong>SSR (Suma de Cuadrados de la Regresión)</strong>: Mide la variabilidad explicada por el modelo. <span class="math inline">\(SSR = \sum(\hat{y}_i - \bar{y})^2\)</span></p></li>
+<li><p><strong>SSE (Suma de Cuadrados del Error)</strong>: Mide la variabilidad no explicada (residual). <span class="math inline">\(SSE = \sum(y_i - \hat{y}_i)^2\)</span></p></li>
+</ul>
+<p><strong>Ecuación fundamental</strong>: <span class="math inline">\(SST = SSR + SSE\)</span></p>
+<p>Esta descomposición permite calcular el coeficiente de determinación: <span class="math inline">\(R^2 = \frac{SSR}{SST} = 1 - \frac{SSE}{SST}\)</span></p>
+</details>
+</section>
+<section id="ejercicio-9-observaciones-influyentes" class="level3" data-number="1.2.7">
+<h3 data-number="1.2.7" class="anchored" data-anchor-id="ejercicio-9-observaciones-influyentes"><span class="header-section-number">1.2.7</span> Ejercicio 9: Observaciones Influyentes</h3>
+<p>Basado en la teoría de los apuntes:</p>
+<ol type="a">
+<li>Explica la diferencia entre un residuo simple (<span class="math inline">\(e_i\)</span>), un residuo estandarizado y un residuo estudentizado. ¿Por qué se prefieren los estudentizados para el diagnóstico?</li>
+<li>¿Qué mide el <strong>leverage</strong> (<span class="math inline">\(h_{ii}\)</span>)? ¿Y la <strong>distancia de Cook</strong> (<span class="math inline">\(D_i\)</span>)? ¿Puede una observación tener un leverage alto y no ser influyente?</li>
+</ol>
+<details>
+<summary>
+</summary>
+<p><strong>a) Tipos de residuos:</strong></p>
+<ul>
+<li><p><strong>Residuo simple (<span class="math inline">\(e_i\)</span>)</strong>: <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span>. Diferencia bruta entre observado y predicho.</p></li>
+<li><p><strong>Residuo estandarizado</strong>: <span class="math inline">\(\frac{e_i}{\hat{\sigma}}\)</span>. Residuo dividido por la desviación estándar residual.</p></li>
+<li><p><strong>Residuo estudentizado</strong>: <span class="math inline">\(\frac{e_i}{\hat{\sigma}_{(i)}\sqrt{1-h_{ii}}}\)</span>. Usa la desviación estándar calculada sin la observación i-ésima.</p></li>
+</ul>
+<p>Los <strong>estudentizados se prefieren</strong> porque tienen propiedades estadísticas más estables y siguen una distribución t conocida.</p>
+<p><strong>b) Medidas de influencia:</strong></p>
+<ul>
+<li><p><strong>Leverage (<span class="math inline">\(h_{ii}\)</span>)</strong>: Mide qué tan extrema es una observación en el espacio de las X. Valores altos indican observaciones con valores de X inusuales.</p></li>
+<li><p><strong>Distancia de Cook (<span class="math inline">\(D_i\)</span>)</strong>: Mide el cambio en las predicciones si se elimina la observación i. Combina residuo y leverage.</p></li>
+</ul>
+<p><strong>Sí, una observación puede tener leverage alto pero no ser influyente</strong> si está cerca de la línea de regresión (residuo pequeño).</p>
+</details>
+</section>
+<section id="ejercicio-10-relación-entre-pruebas-de-hipótesis" class="level3" data-number="1.2.8">
+<h3 data-number="1.2.8" class="anchored" data-anchor-id="ejercicio-10-relación-entre-pruebas-de-hipótesis"><span class="header-section-number">1.2.8</span> Ejercicio 10: Relación entre Pruebas de Hipótesis</h3>
+<p>En el contexto <strong>exclusivo</strong> de la regresión lineal simple, ¿qué relación matemática existe entre el estadístico <strong>F</strong> del test ANOVA y el estadístico <strong>t</strong> del test para la pendiente <span class="math inline">\(\beta_1\)</span>? ¿Qué implica esto para sus respectivos p-valores?</p>
+<details>
+<summary>
+</summary>
+<p>En regresión lineal simple, existe una relación matemática exacta:</p>
+<p><span class="math display">\[F = t^2\]</span></p>
+<p>Donde:</p>
+<ul>
+<li><span class="math inline">\(F\)</span> es el estadístico F del test ANOVA global</li>
+<li><span class="math inline">\(t\)</span> es el estadístico t para la pendiente <span class="math inline">\(\beta_1\)</span></li>
+</ul>
+<p><strong>Implicaciones para los p-valores:</strong></p>
+<ul>
+<li>Los p-valores de ambos tests son <strong>idénticos</strong></li>
+<li>Si el coeficiente de la pendiente es significativo (test t), entonces el modelo global también lo es (test F)</li>
+<li>Ambos tests evalúan la misma hipótesis nula: <span class="math inline">\(H_0: \beta_1 = 0\)</span></li>
+</ul>
+<p>Esta equivalencia solo se da en regresión simple. En regresión múltiple, el test F evalúa todos los coeficientes conjuntamente, mientras que cada test t evalúa coeficientes individuales.</p>
+</details>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./index.html" class="pagination-link" aria-label="Prefacio">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Prefacio</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./tema2_regresion_multiple_soluciones.html" class="pagination-link" aria-label="Regresión Lineal Múltiple">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Regresión Lineal Múltiple</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

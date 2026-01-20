@@ -1,0 +1,45 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Modelos de Regresión"
+  author: 
+    - "Natalia Madrueño Sierro"
+    - "Carmen Lancho Martín"
+    - "Víctor Aceña Gil"
+    - "Isaac Martín de Diego"
+  date: last-modified
+  search: true
+  chapters:
+    - index.qmd
+    - tema0.qmd
+    - tema1.qmd
+    - tema2.qmd
+    - tema3.qmd
+    - tema4.qmd
+    - tema5.qmd
+    - conclusiones.qmd
+    - references.qmd
+  cover-image: images/DSLab_logo_2.png
+
+bibliography: references.bib
+lang: es-ES
+
+format:
+  html:
+    theme: cerulean
+    lang: es-ES
+    css: estilos_html.css
+  pdf:
+    documentclass: scrreprt
+    toc-title: "Índice apuntes"
+
+editor: source
+
+
+
+
+
+
+

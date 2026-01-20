@@ -1,0 +1,16 @@
+---
+format:
+  pdf:
+    pdf-engine: weasyprint
+    include-before-body: portada.html
+    css: ../estilos.css
+---
+
+# Índice de diapositivas
+
+- Introducción a los Modelos Estadísticos para la Predicción
+- Regresión Lineal Simple  
+- Regresión Lineal Múltiple
+- Ingeniería de Características
+- Selección de Variables, Regularización y Validación
+- Modelos Lineales Generalizados (GLM)
