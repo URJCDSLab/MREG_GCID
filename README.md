@@ -422,62 +422,10 @@ Notas:
 - Si usas Windows y no tienes `pdftk`, la generación del archivo maestro seguirá funcionando (se combina con `pdftools::pdf_combine`) pero no se agregarán bookmarks personalizados; instala `pdftk` para añadir bookmarks.
 - Si alguno de los scripts individuales usa Quarto/LaTeX, asegúrate de tener LaTeX (MiKTeX/TinyTeX) configurado previamente.
 
-## 🎨 Características Técnicas
 
-### Diseño y Estilos
-- **Diseño unificado** con logo institucional (DSLAB + URJC)
-- **Paleta de colores consistente** (azul URJC #003366)
-- **Tipografía profesional** con fuentes system-ui optimizadas
-- **Responsive design** para dispositivos móviles
-
-### Funcionalidades Avanzadas
-- **Búsqueda integrada** en el libro web
-- **Navegación por bookmarks** en PDFs
-- **Secciones colapsables** en soluciones HTML
-- **Fórmulas LaTeX** renderizadas correctamente
-- **Código R ejecutable** con salidas incluidas
-- **Enlaces cruzados** entre secciones
-
-### Optimizaciones
-- **PDFs optimizados** para impresión y distribución
-- **HTML auto-contenido** (embed-resources) para distribución offline
-- **Manipulación avanzada de PDFs** con portadas separadas
-- **Control de calidad** con validación automática de código
-
-## 🐛 Solución de Problemas
-
-### Errores Comunes
-
-1. **Error: "quarto not found"**
-   ```bash
-   # Verificar instalación
-   quarto --version
-   # Reinstalar si es necesario
-   ```
-
-2. **Error en PDFs: "LaTeX Error"**
-   ```r
-   # Instalar TinyTeX
-   quarto::quarto_install_tinytex()
-   ```
-
-3. **Error: "File not found" en diapositivas**
-   ```bash
-   # Ejecutar desde la raíz del proyecto
-   pwd  # Debe mostrar ModelosEstadisticosPrediccion
-   ```
-
-4. **Problemas con imágenes**
-   - Verificar que las rutas en los archivos QMD sean relativas al archivo
-   - Asegurar que las imágenes existan en el directorio `images/`
-
----
 
 ## 📄 Licencia
 
 Este material está licenciado bajo [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
-## 👥 Autores
 
-- **Víctor C. Aceña Gil** - [GitHub](https://github.com/Vacek-Ace)
-- **Isaac Martín de Diego** - [GitHub](https://github.com/IsaacMartindeDiego)
