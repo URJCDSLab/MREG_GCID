@@ -1,6 +1,6 @@
 ---
-title: "Introducción a los Modelos Estadísticos para la Predicción"
-author: "Víctor Aceña - Isaac Martín"
+title: "Introducción a Modelos de Regresión"
+author: "Carmen Lancho - Natalia Madrueño"
 institute: "DSLAB"
 date: last-modified
 format: 
@@ -28,7 +28,7 @@ execute:
   message: false
 ---
 
-# El Modelado de Regresión: Una Herramienta Universal
+# El Modelado de Regresión: Una herramienta universal
 
 El modelado de regresión constituye una de las herramientas más potentes y flexibles del arsenal estadístico. Su aplicabilidad abarca un espectro extraordinariamente amplio de disciplinas:
 
