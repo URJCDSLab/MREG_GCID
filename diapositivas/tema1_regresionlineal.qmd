@@ -1,12 +1,11 @@
 ---
-title: "Regresión Lineal Simple"
-author: "Víctor Aceña - Isaac Martín"
+title: "Regresión lineal simple"
+author: "Carmen Lancho - Natalia Madrueño"
 institute: "DSLAB"
 date: last-modified
 format: 
   beamer: 
     theme: "Madrid"
-    colortheme: "dolphin"
     fonttheme: "structurebold"
     navigation: horizontal
     section-titles: false
@@ -14,7 +13,7 @@ format:
     slide-level: 1
     aspectratio: 169
     header-includes: |
-      \usepackage{dslab-new}
+      \usepackage{dslab-new-orange}
       \usedslabmodelos
 knitr:
   opts_chunk:
@@ -26,55 +25,71 @@ execute:
   echo: false
   warning: false
   message: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 # Fundamento del Modelado Estadístico
 
-La regresión lineal constituye uno de los **pilares fundamentales** de la modelización estadística.
+La regresión lineal constituye uno de los **pilares fundamentales** de
+la modelización estadística.
 
 **¿Por qué es tan importante?**
 
-- Es el **primer modelo predictivo** que se aprende por su simplicidad e interpretabilidad
-- Los conceptos aquí desarrollados son la **base para técnicas avanzadas**: regresión múltiple, GLMs, machine learning
-- Proporciona el **marco conceptual** para toda la inferencia estadística en modelos lineales
+-   Es el **primer modelo predictivo** que se aprende por su simplicidad
+    e interpretabilidad
+-   Los conceptos aquí desarrollados son la **base para técnicas
+    avanzadas**: regresión múltiple, GLMs, machine learning
+-   Proporciona el **marco conceptual** para toda la inferencia
+    estadística en modelos lineales
 
 **Nuestro enfoque:**
 
-Seguiremos el **ciclo completo** de un proyecto de modelado: exploración → formalización → estimación → inferencia → diagnóstico
+Seguiremos el **ciclo completo** de un proyecto de modelado: exploración
+→ formalización → estimación → inferencia → diagnóstico
 
 # Objetivos de Aprendizaje
 
-1. **Comprender y aplicar** el proceso de modelización estadística para problemas con una variable predictora
+1.  **Comprender y aplicar** el proceso de modelización estadística para
+    problemas con una variable predictora
 
-2. **Identificar y medir** la correlación lineal entre dos variables como paso previo al modelado
+2.  **Identificar y medir** la correlación lineal entre dos variables
+    como paso previo al modelado
 
-3. **Describir la formulación matemática** del modelo de regresión lineal simple e interpretar sus parámetros
+3.  **Describir la formulación matemática** del modelo de regresión
+    lineal simple e interpretar sus parámetros
 
-4. **Estimar los coeficientes** mediante mínimos cuadrados ordinarios (MCO) y entender sus propiedades
+4.  **Estimar los coeficientes** mediante mínimos cuadrados ordinarios
+    (MCO) y entender sus propiedades
 
-5. **Realizar inferencias** sobre los parámetros del modelo y evaluar su bondad de ajuste
+5.  **Realizar inferencias** sobre los parámetros del modelo y evaluar
+    su bondad de ajuste
 
-6. **Diagnosticar la adecuación** del modelo verificando si se cumplen los supuestos
+6.  **Diagnosticar la adecuación** del modelo verificando si se cumplen
+    los supuestos
 
 # Ejemplo Motivador: Los Datos
 
 ::::: columns
-:::: {.column width="50%"}
-**Pregunta de investigación:** ¿Influye el tiempo de estudio semanal en las calificaciones finales?
+::: {.column width="50%"}
+**Pregunta de investigación:** ¿Influye el tiempo de estudio semanal en
+las calificaciones finales?
 
 \vspace{0.3cm}
 
 **Simulación de datos realista:**
 
-- 100 estudiantes universitarios
-- Tiempo de estudio: entre 5 y 40 horas/semana
-- Calificaciones: escala de 0 a 10 puntos
+-   100 estudiantes universitarios
+-   Tiempo de estudio: entre 5 y 40 horas/semana
+-   Calificaciones: escala de 0 a 10 puntos
 
 \vspace{0.3cm}
 
 **Pregunta:** ¿Qué patrón observas en los datos?
-::::
-:::: {.column width="50%"}
+:::
+
+::: {.column width="50%"}
 ```{r datos-estudio}
 #| fig-width: 5
 #| fig-height: 4
@@ -101,13 +116,13 @@ ggplot(datos, aes(x = Tiempo_Estudio, y = Calificaciones)) +
   theme_classic(base_size = 11) +
   theme(plot.title = element_text(size = 12))
 ```
-::::
+:::
 :::::
 
 # Ejemplo Motivador: Primera Observación
 
 ::::: columns
-:::: {.column width="65%"}
+::: {.column width="65%"}
 ```{r datos-con-tendencia}
 #| fig-width: 5.5
 #| fig-height: 4
@@ -129,72 +144,73 @@ ggplot(datos, aes(x = Tiempo_Estudio, y = Calificaciones)) +
   theme_classic(base_size = 11) +
   theme(plot.title = element_text(size = 12))
 ```
-::::
-:::: {.column width="35%"}
+:::
 
+::: {.column width="35%"}
 \vspace{1cm}
 
-- **Tendencia clara:** A más tiempo de estudio, mejores calificaciones
+-   **Tendencia clara:** A más tiempo de estudio, mejores calificaciones
 
-\vspace{0.5cm}
+-   **Relación lineal:** Los puntos siguen aproximadamente una línea
+    recta
 
-- **Relación lineal:** Los puntos siguen aproximadamente una línea recta
+-   **Dirección positiva:** Pendiente ascendente
 
-\vspace{0.5cm}
-
-- **Dirección positiva:** Pendiente ascendente
-
-\vspace{0.5cm}
-
-**Conclusión:** La tendencia lineal positiva justifica un modelo de regresión lineal.
-::::
+**Conclusión:** La tendencia lineal positiva justifica un modelo de
+regresión lineal.
+:::
 :::::
 
 # Paso 1: Exploración Visual - El Gráfico de Dispersión
 
-El **gráfico de dispersión** (*scatterplot*) es la herramienta más potente para examinar la relación entre dos variables continuas.
+El **gráfico de dispersión** (*scatterplot*) es la herramienta más
+potente para examinar la relación entre dos variables continuas.
 
 **¿Qué nos permite evaluar?**
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **Características de la relación:**
 
-- **Forma**: ¿Es lineal, curva, o sin patrón?
-- **Dirección**: ¿Positiva o negativa?
-- **Fuerza**: ¿Qué tan estrecha es la relación?
-- **Valores atípicos**: ¿Hay observaciones extremas?
-::::
-:::: {.column width="50%"}
+-   **Forma**: ¿Es lineal, curva, o sin patrón?
+-   **Dirección**: ¿Positiva o negativa?
+-   **Fuerza**: ¿Qué tan estrecha es la relación?
+-   **Valores atípicos**: ¿Hay observaciones extremas?
+:::
+
+::: {.column width="50%"}
 **Criterios para regresión lineal:**
 
-- **Linealidad**: Los puntos siguen una tendencia recta
-- **Variabilidad constante**: La dispersión es similar en todo el rango
-- **Sin valores atípicos extremos**: No hay puntos que distorsionen la relación
-::::
+-   **Linealidad**: Los puntos siguen una tendencia recta
+-   **Variabilidad constante**: La dispersión es similar en todo el
+    rango
+-   **Sin valores atípicos extremos**: No hay puntos que distorsionen la
+    relación
+:::
 :::::
 
 **Principio:** La visualización SIEMPRE precede a la cuantificación
 
 # Paso 2: Cuantificación - Covarianza y Correlación
 
-Una vez que la visualización sugiere una tendencia, necesitamos métricas para cuantificarla.
+Una vez que la visualización sugiere una tendencia, necesitamos métricas
+para cuantificarla.
 
 **Covarianza muestral:**
 $$\text{Cov}(x, y) = s_{xy} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{n-1}$$
 
-- **Problema**: Su magnitud depende de las unidades de las variables
+-   **Problema**: Su magnitud depende de las unidades de las variables
 
 **Coeficiente de correlación de Pearson:**
 $$r = r_{xy} = \frac{s_{xy}}{s_x s_y}$$
 
-- **Ventajas**: Adimensional, siempre entre -1 y 1
-- **Interpretación**: Fuerza de la asociación *lineal*
+-   **Ventajas**: Adimensional, siempre entre -1 y 1
+-   **Interpretación**: Fuerza de la asociación *lineal*
 
 # Cuantificación en Nuestro Ejemplo
 
 ::::: columns
-:::: {.column width="60%"}
+::: {.column width="60%"}
 ```{r cuantificacion}
 #| fig-width: 5.5
 #| fig-height: 4
@@ -219,87 +235,100 @@ ggplot(datos, aes(x = Tiempo_Estudio, y = Calificaciones)) +
   theme_classic(base_size = 11) +
   theme(plot.title = element_text(size = 12))
 ```
-::::
-:::: {.column width="40%"}
+:::
 
+::: {.column width="40%"}
 \vspace{1cm}
 
 **Resultados del análisis:**
 
 \vspace{0.5cm}
 
-- **Covarianza**: `r round(covarianza, 2)` 
-  
-  (difícil de interpretar por las unidades)
+-   **Covarianza**: `r round(covarianza, 2)`
+
+    (difícil de interpretar por las unidades)
 
 \vspace{0.5cm}
 
-- **Correlación**: **`r round(correlacion, 3)`** 
-  
-  (asociación lineal muy fuerte y positiva)
+-   **Correlación**: **`r round(correlacion, 3)`**
+
+    (asociación lineal muy fuerte y positiva)
 
 \vspace{0.5cm}
 
 La línea roja muestra la **tendencia lineal** de los datos.
-::::
+:::
 :::::
 
 # Correlación NO Implica Causalidad
 
-Encontrar una **correlación fuerte** (`r round(correlacion, 3)`) entre tiempo de estudio y calificaciones **NO** nos autoriza a concluir que *una causa la otra*.
+Encontrar una **correlación fuerte** (`r round(correlacion, 3)`) entre
+tiempo de estudio y calificaciones **NO** nos autoriza a concluir que
+*una causa la otra*.
 
 **¿Por qué?**
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **Posibles explicaciones alternativas:**
 
-- **Variable oculta**: El interés del estudiante influye tanto en las horas de estudio como en las calificaciones
-- **Causalidad inversa**: Los estudiantes con mejores calificaciones se motivan a estudiar más
-- **Terceras variables**: Calidad del sueño, técnicas de estudio, etc.
-::::
-:::: {.column width="50%"}
+-   **Variable oculta**: El interés del estudiante influye tanto en las
+    horas de estudio como en las calificaciones
+-   **Causalidad inversa**: Los estudiantes con mejores calificaciones
+    se motivan a estudiar más
+-   **Terceras variables**: Calidad del sueño, técnicas de estudio, etc.
+:::
+
+::: {.column width="50%"}
 **La regresión lineal puede:**
 
-Demostrar que las variables se mueven juntas  
-Permitirnos predecir una a partir de la otra  
+Demostrar que las variables se mueven juntas\
+Permitirnos predecir una a partir de la otra\
 Cuantificar la fuerza de la asociación
 
 **NO puede:**
 
-Explicar el porqué de la relación  
+Explicar el porqué de la relación\
 Establecer causalidad sin diseño experimental
-::::
+:::
 :::::
+
+# Correlación NO Implica Causalidad
+
+![](images/clipboard-1981205106.jpeg){fig-align="center" width="350"}
 
 # El Modelo Poblacional
 
-Una vez confirmada la relación lineal, **formalizamos** matemáticamente nuestra observación.
+Una vez confirmada la relación lineal, **formalizamos** matemáticamente
+nuestra observación.
 
-**El modelo poblacional** postula que la relación verdadera sigue una línea recta con aleatoriedad:
+**El modelo poblacional** postula que la relación verdadera sigue una
+línea recta con aleatoriedad:
 
 $$Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i$$
 
 **Componentes:**
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **Parte sistemática:**
 
-- $\beta_0$: **Intercepto** (parámetro poblacional desconocido)
-- $\beta_1$: **Pendiente** (parámetro poblacional desconocido)
-::::
-:::: {.column width="50%"}
+-   $\beta_0$: **Intercepto** (parámetro poblacional desconocido)
+-   $\beta_1$: **Pendiente** (parámetro poblacional desconocido)
+:::
+
+::: {.column width="50%"}
 **Parte aleatoria:**
 
-- $\varepsilon_i$: **Error aleatorio** que incluye:
-  - Variables omitidas
-  - Error de medición  
-  - Aleatoriedad intrínseca
-::::
+-   $\varepsilon_i$: **Error aleatorio** que incluye:
+    -   Variables omitidas
+    -   Error de medición\
+    -   Aleatoriedad intrínseca
+:::
 :::::
 
-**Nunca observamos la población** → Usamos la muestra para estimar el **modelo muestral**
+**Nunca observamos la población** → Usamos la muestra para estimar el
+**modelo muestral**
 
 # Del Modelo Poblacional al Modelo Muestral
 
@@ -311,46 +340,56 @@ $$\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$$
 
 **Terminología clave:**
 
-- Los "**gorros**" ($\hat{\cdot}$) indican **estimaciones** calculadas de la muestra
-- La diferencia $e_i = y_i - \hat{y}_i$ es el **residuo** (aproximación empírica del error $\varepsilon_i$)
-- $\hat{y}_i$ es el **valor predicho** por el modelo
+-   Los "**gorros**" ($\hat{\cdot}$) indican **estimaciones** calculadas
+    de la muestra
+-   La diferencia $e_i = y_i - \hat{y}_i$ es el **residuo**
+    (aproximación empírica del error $\varepsilon_i$)
+-   $\hat{y}_i$ es el **valor predicho** por el modelo
 
 **Objetivo:** Usar la muestra para encontrar la "mejor" recta de ajuste
 
-# Los Supuestos del Modelo 
+# Los Supuestos del Modelo
 
-Para que nuestras estimaciones e inferencias sean válidas, asumimos que los errores $\varepsilon_i$ se comportan ordenadamente:
+Para que nuestras estimaciones e inferencias sean válidas, asumimos que
+los errores $\varepsilon_i$ se comportan ordenadamente:
 
 **1. Linealidad**: $E[Y_i | X_i] = \beta_0 + \beta_1 X_i$
 
-**2. Independencia**: $\text{Cov}(\varepsilon_i, \varepsilon_j) = 0$ para $i \neq j$
+**2. Independencia**: $\text{Cov}(\varepsilon_i, \varepsilon_j) = 0$
+para $i \neq j$
 
-**3. Homocedasticidad**: $Var(\varepsilon_i | X_i) = \sigma^2$ (varianza constante)
+**3. Homocedasticidad**: $Var(\varepsilon_i | X_i) = \sigma^2$ (varianza
+constante)
 
 **4. Normalidad** (para inferencia): $\varepsilon_i \sim N(0, \sigma^2)$
 
-**Importancia:** Estos supuestos garantizan las **propiedades óptimas** de los estimadores de mínimos cuadrados y la **validez** de la inferencia estadística.
+**Importancia:** Estos supuestos garantizan las **propiedades óptimas**
+de los estimadores de mínimos cuadrados y la **validez** de la
+inferencia estadística.
 
 # El Método de Mínimos Cuadrados Ordinarios (MCO)
 
-**Criterio:** Encontrar la recta que **minimice** la suma de los cuadrados de los errores.
+**Criterio:** Encontrar la recta que **minimice** la suma de los
+cuadrados de los errores.
 
 $$\text{SSE}(\beta_0, \beta_1) = \sum_{i=1}^{n} e_i^2 = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = \sum_{i=1}^{n} (y_i - (\beta_0 + \beta_1 x_i))^2$$
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **¿Por qué este criterio?**
 
-- Los errores positivos y negativos no se cancelan
-- Penaliza más los errores grandes
-- Tiene solución analítica única
-- Proporciona estimadores con propiedades óptimas
-::::
-:::: {.column width="50%"}
+-   Los errores positivos y negativos no se cancelan
+-   Penaliza más los errores grandes
+-   Tiene solución analítica única
+-   Proporciona estimadores con propiedades óptimas
+:::
+
+::: {.column width="50%"}
 **Interpretación geométrica:**
 
-Minimizamos la suma de las **distancias verticales al cuadrado** entre los puntos observados y la recta de regresión.
-::::
+Minimizamos la suma de las **distancias verticales al cuadrado** entre
+los puntos observados y la recta de regresión.
+:::
 :::::
 
 # Derivación de las Fórmulas de MCO
@@ -364,12 +403,13 @@ $$\frac{\partial \text{SSE}}{\partial \beta_1} = -2 \sum_{i=1}^{n} x_i (y_i - \b
 
 **Resolviendo el sistema (ecuaciones normales):**
 
-Al resolver estas ecuaciones simultáneamente, obtenemos las fórmulas de MCO.
+Al resolver estas ecuaciones simultáneamente, obtenemos las fórmulas de
+MCO.
 
 # Fórmulas Finales de MCO
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **Fórmula para la pendiente:**
 $$\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}$$
 
@@ -379,82 +419,93 @@ $$= \frac{s_{xy}}{s_{xx}} = \frac{\text{Covarianza muestral}}{\text{Varianza mue
 
 **Fórmula para el intercepto:**
 $$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}$$
-::::
-:::: {.column width="50%"}
+:::
+
+::: {.column width="50%"}
 **Notación:**
 
 \vspace{0.3cm}
 
-- $s_{xy} = \sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})$ 
-  
-  (suma de productos cruzados)
+-   $s_{xy} = \sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})$
+
+    (suma de productos cruzados)
 
 \vspace{0.3cm}
 
-- $s_{xx} = \sum_{i=1}^{n}(x_i - \bar{x})^2$ 
-  
-  (suma de cuadrados de $X$)
+-   $s_{xx} = \sum_{i=1}^{n}(x_i - \bar{x})^2$
+
+    (suma de cuadrados de $X$)
 
 \vspace{0.3cm}
 
 **Interpretación intuitiva:**
 
-La pendiente es la razón entre la covariación de $X$ e $Y$ y la variación de $X$.
-::::
+La pendiente es la razón entre la covariación de $X$ e $Y$ y la
+variación de $X$.
+:::
 :::::
 
 # Propiedades de las Predicciones
 
-Las estimaciones MCO generan predicciones ($\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$) con **propiedades matemáticas específicas**:
+Las estimaciones MCO generan predicciones
+($\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i$) con **propiedades
+matemáticas específicas**:
 
-1. **La recta pasa por el centro de los datos**: $(\bar{x}, \bar{y})$
-   $$\hat{\beta}_0 + \hat{\beta}_1 \bar{x} = \bar{y}$$
+1.  **La recta pasa por el centro de los datos**: $(\bar{x}, \bar{y})$
+    $$\hat{\beta}_0 + \hat{\beta}_1 \bar{x} = \bar{y}$$
 
-**Demostración:**
-Sumando la ecuación de predicción para todas las observaciones:
+**Demostración:** Sumando la ecuación de predicción para todas las
+observaciones:
 $$\frac{1}{n}\sum_{i=1}^{n} \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 \frac{1}{n}\sum_{i=1}^{n} x_i = \hat{\beta}_0 + \hat{\beta}_1 \bar{x}$$
 
-2. **Promedio de predicciones = Promedio observado**:
-   $$\frac{1}{n}\sum_{i=1}^{n} \hat{y}_i = \bar{y}$$
+2.  **Promedio de predicciones = Promedio observado**:
+    $$\frac{1}{n}\sum_{i=1}^{n} \hat{y}_i = \bar{y}$$
 
-**Importancia:** La recta de regresión siempre pasa por el **punto central** de los datos
+**Importancia:** La recta de regresión siempre pasa por el **punto
+central** de los datos
 
 # Propiedades de los Residuos
 
-Los residuos MCO ($e_i = y_i - \hat{y}_i$) tienen **propiedades fundamentales**:
+Los residuos MCO ($e_i = y_i - \hat{y}_i$) tienen **propiedades
+fundamentales**:
 
-3. **Suma de residuos = 0**:
-   $$\sum_{i=1}^{n} e_i = 0$$
+3.  **Suma de residuos = 0**: $$\sum_{i=1}^{n} e_i = 0$$
 
-4. **Residuos no correlacionados con $X$**:
-   $$\sum_{i=1}^{n} x_i e_i = 0$$
+4.  **Residuos no correlacionados con** $X$:
+    $$\sum_{i=1}^{n} x_i e_i = 0$$
 
-5. **Residuos no correlacionados con predicciones**:
-   $$\sum_{i=1}^{n} \hat{y}_i e_i = 0$$
+5.  **Residuos no correlacionados con predicciones**:
+    $$\sum_{i=1}^{n} \hat{y}_i e_i = 0$$
 
-**Implicación:** Estas propiedades garantizan que MCO es **insesgado** y **óptimo**
+**Implicación:** Estas propiedades garantizan que MCO es **insesgado** y
+**óptimo**
 
 # Interpretación de los Coeficientes
 
-Una vez estimados, los coeficientes tienen interpretación concreta y práctica:
+Una vez estimados, los coeficientes tienen interpretación concreta y
+práctica:
 
 **Pendiente** ($\hat{\beta}_1$):
 
-- Representa el **cambio promedio esperado** en $Y$ por cada **aumento de una unidad** en $X$
-- En nuestro ejemplo: puntos que aumenta la calificación por cada hora adicional de estudio
+-   Representa el **cambio promedio esperado** en $Y$ por cada **aumento
+    de una unidad** en $X$
+-   En nuestro ejemplo: puntos que aumenta la calificación por cada hora
+    adicional de estudio
 
 **Intercepto** ($\hat{\beta}_0$):
 
-- Valor promedio esperado de $Y$ cuando $X = 0$
-- Solo tiene sentido práctico si $X = 0$ es plausible y está en el rango de los datos
-- A menudo es solo un "ancla matemática" para la recta
+-   Valor promedio esperado de $Y$ cuando $X = 0$
+-   Solo tiene sentido práctico si $X = 0$ es plausible y está en el
+    rango de los datos
+-   A menudo es solo un "ancla matemática" para la recta
 
-**Nota importante:** La interpretación siempre debe considerar el contexto del problema y la plausibilidad de los valores.
+**Nota importante:** La interpretación siempre debe considerar el
+contexto del problema y la plausibilidad de los valores.
 
 # Aplicación: Ajuste del Modelo en Nuestro Ejemplo
 
 ::::: columns
-:::: {.column width="55%"}
+::: {.column width="55%"}
 ```{r ajuste-modelo}
 #| fig-width: 4.5
 #| fig-height: 3.5
@@ -482,51 +533,57 @@ ggplot(datos, aes(x = Tiempo_Estudio, y = Calificaciones)) +
   theme_classic(base_size = 10) +
   theme(plot.title = element_text(size = 11))
 ```
-::::
-:::: {.column width="45%"}
+:::
 
-
-
+::: {.column width="45%"}
 **Ecuación del modelo:**
 $$\text{Calificaciones} = `r round(coef_intercepto, 3)` + `r round(coef_pendiente, 3)` \times \text{Tiempo\_Estudio}$$
 
 **Interpretación de coeficientes:**
 
-\vspace{0.3cm}
+\vspace{0.1cm}
 
-- **Intercepto** ($\hat{\beta}_0 = `r round(coef_intercepto, 3)`$): Calificación esperada con 0 horas de estudio
+-   **Intercepto** ($\hat{\beta}_0 = `r round(coef_intercepto, 3)`$):
+    Calificación esperada con 0 horas de estudio
 
-\vspace{0.3cm}
+\vspace{0.1cm}
 
-- **Pendiente** ($\hat{\beta}_1 = `r round(coef_pendiente, 3)`$): Por cada hora adicional de estudio, la calificación aumenta en promedio `r round(coef_pendiente, 3)` puntos
+-   **Pendiente** ($\hat{\beta}_1 = `r round(coef_pendiente, 3)`$): Por
+    cada hora adicional de estudio, la calificación aumenta en promedio
+    `r round(coef_pendiente, 3)` puntos
 
-\vspace{0.3cm}
+\vspace{0.1cm}
 
-**Conclusión:** Relación positiva y significativa entre tiempo de estudio y calificaciones.
-::::
+**Conclusión:** Relación positiva y significativa entre tiempo de
+estudio y calificaciones.
+:::
 :::::
 
 # Propiedades de los Estimadores de MCO
 
-Bajo los supuestos de Gauss-Markov, los estimadores MCO son **MELI** (Mejores Estimadores Lineales Insesgados):
+Bajo los supuestos de Gauss-Markov, los estimadores MCO son **MELI**
+(Mejores Estimadores Lineales Insesgados):
 
 **1. Insesgadez:**
 $$E[\hat{\beta}_0] = \beta_0 \quad \text{y} \quad E[\hat{\beta}_1] = \beta_1$$
 
-Los estimadores MCO son **correctos en promedio** - no tienen sesgo sistemático.
+Los estimadores MCO son **correctos en promedio** - no tienen sesgo
+sistemático.
 
-**2. Varianza mínima:** 
+**2. Varianza mínima:**
 
-Entre todos los estimadores lineales insesgados, los MCO tienen la menor varianza posible.
+Entre todos los estimadores lineales insesgados, los MCO tienen la menor
+varianza posible.
 
-**3. Varianzas conocidas:** 
+**3. Varianzas conocidas:**
 
-Las varianzas de los estimadores tienen formas matemáticas específicas y conocidas.
+Las varianzas de los estimadores tienen formas matemáticas específicas y
+conocidas.
 
 # Varianzas de los Estimadores de MCO
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **Para la pendiente:**
 $$Var(\hat{\beta}_1) = \frac{\sigma^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2} = \frac{\sigma^2}{S_{xx}}$$
 
@@ -536,10 +593,12 @@ donde $S_{xx} = \sum_{i=1}^{n}(x_i - \bar{x})^2$
 
 **Interpretación:**
 
-- $Var(\hat{\beta}_1)$ disminuye con mayor dispersión en $X$ (mayor $S_{xx}$)
-- Más datos esparcidos → mejor estimación de la pendiente
-::::
-:::: {.column width="50%"}
+-   $Var(\hat{\beta}_1)$ disminuye con mayor dispersión en $X$ (mayor
+    $S_{xx}$)
+-   Más datos esparcidos → mejor estimación de la pendiente
+:::
+
+::: {.column width="50%"}
 **Para el intercepto:**
 $$Var(\hat{\beta}_0) = \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{S_{xx}} \right]$$
 
@@ -547,72 +606,77 @@ $$Var(\hat{\beta}_0) = \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{S_{xx}} \r
 
 **Interpretación:**
 
-- $Var(\hat{\beta}_0)$ aumenta cuando $\bar{x}$ está lejos de cero
-- El intercepto se estima mejor cuando $\bar{x}$ está cerca de cero
-- Mayor tamaño de muestra ($n$) reduce la varianza
-::::
+-   $Var(\hat{\beta}_0)$ aumenta cuando $\bar{x}$ está lejos de cero
+-   El intercepto se estima mejor cuando $\bar{x}$ está cerca de cero
+-   Mayor tamaño de muestra ($n$) reduce la varianza
+:::
 :::::
 
 # Estimación de la Varianza del Error
 
-Las fórmulas de varianza dependen de $\sigma^2$ (desconocida). La estimamos con:
+Las fórmulas de varianza dependen de $\sigma^2$ (desconocida). La
+estimamos con:
 
 **Media Cuadrática del Error (MSE):**
 $$\hat{\sigma}^2 = \text{MSE} = \frac{\text{SSE}}{n-2} = \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{n-2}$$
 
-**¿Por qué $n-2$?**
+**¿Por qué** $n-2$?
 
-- Son los **grados de libertad del error**
-- Hemos "gastado" 2 grados de libertad estimando $\beta_0$ y $\beta_1$
+-   Son los **grados de libertad del error**
+-   Hemos "gastado" 2 grados de libertad estimando $\beta_0$ y $\beta_1$
 
-**Error estándar de los residuos:**
-$$\hat{\sigma} = \sqrt{\text{MSE}}$$
+**Error estándar de los residuos:** $$\hat{\sigma} = \sqrt{\text{MSE}}$$
 
-También llamado **RMSE** en *machine learning* → Mide la dispersión promedio alrededor de la recta
+También llamado **RMSE** en *machine learning* → Mide la dispersión
+promedio alrededor de la recta
 
 # Análisis de la Varianza (ANOVA) para la Regresión
 
-**Pregunta clave:** ¿Es el modelo útil o la relación observada es casualidad?
+**Pregunta clave:** ¿Es el modelo útil o la relación observada es
+casualidad?
 
 **Contraste de hipótesis:**
 
-- $H_0: \beta_1 = 0$ (no hay relación lineal)
-- $H_1: \beta_1 \neq 0$ (sí hay relación lineal)
+-   $H_0: \beta_1 = 0$ (no hay relación lineal)
+-   $H_1: \beta_1 \neq 0$ (sí hay relación lineal)
 
 **Descomposición de la variabilidad total:**
 $$\text{SST} = \text{SSR} + \text{SSE}$$
 
-**Esta ecuación es fundamental:** Toda la variabilidad se divide en **explicada** y **no explicada**
+**Esta ecuación es fundamental:** Toda la variabilidad se divide en
+**explicada** y **no explicada**
 
 # Suma Total de Cuadrados (SST)
 
-**Definición:**
-$$\text{SST} = \sum_{i=1}^{n} (y_i - \bar{y})^2$$
+**Definición:** $$\text{SST} = \sum_{i=1}^{n} (y_i - \bar{y})^2$$
 
 **¿Qué mide?**
 
-- La **variabilidad total** de $Y$ respecto a su media $\bar{y}$
-- Es la varianza muestral de $Y$ multiplicada por $(n-1)$
-- Representa **toda la dispersión** que queremos explicar con nuestro modelo
-
-**Interpretación:** 
-
-Si no tuviéramos ningún modelo y solo usáramos $\bar{y}$ para predecir, SST sería el **error total** que cometeríamos.
-
-# Suma de Cuadrados de la Regresión (SSR)
-
-**Definición:**
-$$\text{SSR} = \sum_{i=1}^{n} (\hat{y}_i - \bar{y})^2$$
-
-**¿Qué mide?**
-
-- La variabilidad que **explica** nuestro modelo de regresión
-- Es la variabilidad de las predicciones $\hat{y}_i$ respecto a la media $\bar{y}$
-- Representa la **señal** que nuestro modelo logra captar
+-   La **variabilidad total** de $Y$ respecto a su media $\bar{y}$
+-   Es la varianza muestral de $Y$ multiplicada por $(n-1)$
+-   Representa **toda la dispersión** que queremos explicar con nuestro
+    modelo
 
 **Interpretación:**
 
-Mide cuánto **mejor** es nuestro modelo comparado con simplemente usar $\bar{y}$ como predicción.
+Si no tuviéramos ningún modelo y solo usáramos $\bar{y}$ para predecir,
+SST sería el **error total** que cometeríamos.
+
+# Suma de Cuadrados de la Regresión (SSR)
+
+**Definición:** $$\text{SSR} = \sum_{i=1}^{n} (\hat{y}_i - \bar{y})^2$$
+
+**¿Qué mide?**
+
+-   La variabilidad que **explica** nuestro modelo de regresión
+-   Es la variabilidad de las predicciones $\hat{y}_i$ respecto a la
+    media $\bar{y}$
+-   Representa la **señal** que nuestro modelo logra captar
+
+**Interpretación:**
+
+Mide cuánto **mejor** es nuestro modelo comparado con simplemente usar
+$\bar{y}$ como predicción.
 
 # Suma de Cuadrados del Error (SSE)
 
@@ -621,58 +685,61 @@ $$\text{SSE} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 = \sum_{i=1}^{n} e_i^2$$
 
 **¿Qué mide?**
 
-- La variabilidad **no explicada** por nuestro modelo
-- Es la suma de los cuadrados de los residuos
-- Representa el **ruido** que nuestro modelo no puede captar
+-   La variabilidad **no explicada** por nuestro modelo
+-   Es la suma de los cuadrados de los residuos
+-   Representa el **ruido** que nuestro modelo no puede captar
 
 **Interpretación:**
 
-Es exactamente lo que **minimiza el método MCO** para encontrar la mejor recta.
+Es exactamente lo que **minimiza el método MCO** para encontrar la mejor
+recta.
 
 # La Descomposición Fundamental de la Variabilidad
 
-**La ecuación clave:**
-$$\text{SST} = \text{SSR} + \text{SSE}$$
+**La ecuación clave:** $$\text{SST} = \text{SSR} + \text{SSE}$$
 
 **Interpretación intuitiva:**
 
 ::::: columns
-:::: {.column width="50%"}
+::: {.column width="50%"}
 **En palabras:**
 
-- **SST**: "¿Cuánta variabilidad hay que explicar?"
-- **SSR**: "¿Cuánta variabilidad explica mi modelo?"  
-- **SSE**: "¿Cuánta variabilidad queda sin explicar?"
-::::
-:::: {.column width="50%"}
+-   **SST**: "¿Cuánta variabilidad hay que explicar?"
+-   **SSR**: "¿Cuánta variabilidad explica mi modelo?"\
+-   **SSE**: "¿Cuánta variabilidad queda sin explicar?"
+:::
+
+::: {.column width="50%"}
 **En porcentajes:**
 
-- **SST**: 100% de la variabilidad
-- **SSR**: % explicado por el modelo
-- **SSE**: % no explicado (error)
-::::
+-   **SST**: 100% de la variabilidad
+-   **SSR**: % explicado por el modelo
+-   **SSE**: % no explicado (error)
+:::
 :::::
 
 **Consecuencia:** Si SSR es grande comparado con SSE → El modelo es útil
 
-# El Estadístico F 
+# El Estadístico F
 
 **Estadístico F:**
 $$F = \frac{\text{MSR}}{\text{MSE}} = \frac{\text{SSR}/1}{\text{SSE}/(n-2)}$$
 
 **Interpretación:**
 
-- **MSR**: Variabilidad explicada por grado de libertad
-- **MSE**: Variabilidad no explicada por grado de libertad  
-- **F**: Ratio entre variabilidad explicada vs no explicada
+-   **MSR**: Variabilidad explicada por grado de libertad
+-   **MSE**: Variabilidad no explicada por grado de libertad\
+-   **F**: Ratio entre variabilidad explicada vs no explicada
 
 # La Lógica del Contraste F (I): Si No Hay Relación
 
-**Si $H_0: \beta_1 = 0$ fuera cierta (no hay relación lineal):**
+**Si** $H_0: \beta_1 = 0$ fuera cierta (no hay relación lineal):
 
-- El modelo lineal sería **inútil** para explicar $Y$
-- Todas las predicciones $\hat{y}_i$ serían iguales a $\bar{y}$
-- Por tanto: $\text{SSR} = \sum_{i=1}^{n}(\hat{y}_i - \bar{y})^2 \approx 0$ (muy pequeña)
+-   El modelo lineal sería **inútil** para explicar $Y$
+-   Todas las predicciones $\hat{y}_i$ serían iguales a $\bar{y}$
+-   Por tanto:
+    $\text{SSR} = \sum_{i=1}^{n}(\hat{y}_i - \bar{y})^2 \approx 0$ (muy
+    pequeña)
 
 **Consecuencia matemática:**
 $$F = \frac{\text{SSR}/1}{\text{SSE}/(n-2)} \approx \frac{0}{\text{MSE}} \approx 0$$
@@ -681,19 +748,20 @@ $$F = \frac{\text{SSR}/1}{\text{SSE}/(n-2)} \approx \frac{0}{\text{MSE}} \approx
 
 # La Lógica del Contraste F (II): Si Hay Relación
 
-**Si $H_1: \beta_1 \neq 0$ fuera cierta (sí hay relación lineal):**
+**Si** $H_1: \beta_1 \neq 0$ fuera cierta (sí hay relación lineal):
 
-- El modelo **captura** la relación entre $X$ e $Y$
-- Las predicciones $\hat{y}_i$ varían siguiendo el patrón de los datos
-- Por tanto: SSR sería **grande** (el modelo explica mucha variabilidad)
+-   El modelo **captura** la relación entre $X$ e $Y$
+-   Las predicciones $\hat{y}_i$ varían siguiendo el patrón de los datos
+-   Por tanto: SSR sería **grande** (el modelo explica mucha
+    variabilidad)
 
 **Consecuencia matemática:**
 $$F = \frac{\text{SSR \text{ grande}}}{\text{MSE}} >> 1$$
 
 **Decisión estadística:**
 
-- **F $\approx$ 0** → No rechazamos $H_0$ → El modelo no es útil
-- **F >> 1** → Rechazamos $H_0$ → El modelo **sí es útil**
+-   **F** $\approx$ 0 → No rechazamos $H_0$ → El modelo no es útil
+-   **F \>\> 1** → Rechazamos $H_0$ → El modelo **sí es útil**
 
 # Tabla ANOVA: Resumen de la Descomposición
 
@@ -705,34 +773,38 @@ $$F = \frac{\text{SSR \text{ grande}}}{\text{MSE}} >> 1$$
 
 **¿Cómo leer esta tabla?**
 
-- **Fila "Regresión"**: Cuantifica lo que el modelo **explica**
-- **Fila "Error"**: Cuantifica lo que el modelo **no explica** 
-- **Fila "Total"**: La variabilidad total que queremos explicar
+-   **Fila "Regresión"**: Cuantifica lo que el modelo **explica**
+-   **Fila "Error"**: Cuantifica lo que el modelo **no explica**
+-   **Fila "Total"**: La variabilidad total que queremos explicar
 
-**El estadístico F resume todo:** 
+**El estadístico F resume todo:**
 $$F = \frac{\text{Variabilidad explicada por df}}{\text{Variabilidad no explicada por df}} = \frac{MSR}{MSE}$$
 
-En regresión simple, $F = t^2$ donde $t$ es el estadístico para contrastar $\beta_1 = 0$
+En regresión simple, $F = t^2$ donde $t$ es el estadístico para
+contrastar $\beta_1 = 0$
 
 # Bondad del Ajuste: Coeficiente de Determinación ($R^2$)
 
-El $R^2$ cuantifica **qué proporción** de la variabilidad total es explicada por el modelo:
+El $R^2$ cuantifica **qué proporción** de la variabilidad total es
+explicada por el modelo:
 
 $$R^2 = \frac{\text{SSR}}{\text{SST}} = 1 - \frac{\text{SSE}}{\text{SST}}$$
 
 **Interpretación:**
 
-- $R^2 = 0$: El modelo no explica nada (tan malo como usar $\bar{y}$)
-- $R^2 = 1$: El modelo explica toda la variabilidad (ajuste perfecto)
-- $R^2 = 0.7$: El modelo explica el 70% de la variabilidad
+-   $R^2 = 0$: El modelo no explica nada (tan malo como usar $\bar{y}$)
+-   $R^2 = 1$: El modelo explica toda la variabilidad (ajuste perfecto)
+-   $R^2 = 0.7$: El modelo explica el 70% de la variabilidad
 
 **En regresión simple:** $R^2 = r^2$ (cuadrado de la correlación)
 
-**Precaución:** Un $R^2$ alto no garantiza un buen modelo ni implica causalidad
+**Precaución:** Un $R^2$ alto no garantiza un buen modelo ni implica
+causalidad
 
 # Inferencia sobre los Coeficientes
 
-Para realizar inferencias necesitamos el supuesto de **normalidad** de los errores.
+Para realizar inferencias necesitamos el supuesto de **normalidad** de
+los errores.
 
 **Distribución de los estimadores:**
 $$\hat{\beta}_1 \sim N\left(\beta_1, \frac{\sigma^2}{S_{xx}}\right) \quad \quad \hat{\beta}_0 \sim N\left(\beta_0, \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{S_{xx}} \right]\right)$$
@@ -746,14 +818,15 @@ donde $\text{SE}(\hat{\beta}_1) = \sqrt{\frac{\text{MSE}}{S_{xx}}}$
 
 **Contraste para la pendiente:**
 
-- $H_0: \beta_1 = 0$ vs $H_1: \beta_1 \neq 0$
-- Estadístico: $t_0 = \frac{\hat{\beta}_1}{\text{SE}(\hat{\beta}_1)}$
-- Decisión: Rechazar $H_0$ si $|t_0| > t_{\alpha/2, n-2}$
+-   $H_0: \beta_1 = 0$ vs $H_1: \beta_1 \neq 0$
+-   Estadístico: $t_0 = \frac{\hat{\beta}_1}{\text{SE}(\hat{\beta}_1)}$
+-   Decisión: Rechazar $H_0$ si $|t_0| > t_{\alpha/2, n-2}$
 
-**Intervalo de confianza al $(1-\alpha)100\%$ para $\beta_1$:**
+**Intervalo de confianza al** $(1-\alpha)100\%$ para $\beta_1$:
 $$\hat{\beta}_1 \pm t_{\alpha/2, n-2} \cdot \text{SE}(\hat{\beta}_1)$$
 
-**Interpretación:** Si el IC no contiene el cero → $\beta_1$ es significativo
+**Interpretación:** Si el IC no contiene el cero → $\beta_1$ es
+significativo
 
 # Resultados del Modelo en Nuestro Ejemplo
 
@@ -771,34 +844,47 @@ summary(modelo_estudio)
 
 **Coeficientes:**
 
-- **Intercepto:** `r round(coef(modelo_estudio)[1], 3)` → Calificación esperada cuando el tiempo de estudio es 0 horas
-- **Pendiente:** `r round(coef(modelo_estudio)[2], 4)` → Por cada hora adicional de estudio, la calificación aumenta en promedio `r round(coef(modelo_estudio)[2], 4)` puntos
+-   **Intercepto:** `r round(coef(modelo_estudio)[1], 3)` → Calificación
+    esperada cuando el tiempo de estudio es 0 horas
+-   **Pendiente:** `r round(coef(modelo_estudio)[2], 4)` → Por cada hora
+    adicional de estudio, la calificación aumenta en promedio
+    `r round(coef(modelo_estudio)[2], 4)` puntos
 
-**Bondad de ajuste:**
-**R-cuadrado:** `r round(summary(modelo_estudio)$r.squared, 4)` → El modelo explica el **`r round(summary(modelo_estudio)$r.squared * 100, 1)`%** de la variabilidad en las calificaciones
+**Bondad de ajuste:** **R-cuadrado:**
+`r round(summary(modelo_estudio)$r.squared, 4)` → El modelo explica el
+**`r round(summary(modelo_estudio)$r.squared * 100, 1)`%** de la
+variabilidad en las calificaciones
 
 **Significancia:**
 
-- **Coeficientes:** Ambos son altamente significativos (p < 2e-16)
-- **Modelo global:** F = `r round(summary(modelo_estudio)$fstatistic[1], 1)` con p < 2.2e-16 → El modelo es **estadísticamente útil**
+-   **Coeficientes:** Ambos son altamente significativos (p \< 2e-16)
+-   **Modelo global:** F =
+    `r round(summary(modelo_estudio)$fstatistic[1], 1)` con p \< 2.2e-16
+    → El modelo es **estadísticamente útil**
 
-**Error estándar residual:** `r round(summary(modelo_estudio)$sigma, 3)` → Dispersión típica alrededor de la recta de regresión
+**Error estándar residual:** `r round(summary(modelo_estudio)$sigma, 3)`
+→ Dispersión típica alrededor de la recta de regresión
 
 # Predicción con el Modelo
 
-Una vez validado, usamos el modelo para **hacer predicciones**. Hay dos tipos:
+Una vez validado, usamos el modelo para **hacer predicciones**. Hay dos
+tipos:
 
 **1. Intervalo de confianza para la respuesta media:**
 
-- Pregunta: ¿Cuál es la calificación *promedio* esperada para todos los estudiantes que estudian $x_0$ horas?
-- Estima dónde se encuentra la **línea de regresión verdadera**
+-   Pregunta: ¿Cuál es la calificación *promedio* esperada para todos
+    los estudiantes que estudian $x_0$ horas?
+-   Estima dónde se encuentra la **línea de regresión verdadera**
 
 **2. Intervalo de predicción para una respuesta individual:**
 
-- Pregunta: ¿Entre qué valores esperamos la calificación de *un estudiante específico* que estudia $x_0$ horas?
-- Considera tanto la incertidumbre del modelo como la variabilidad individual
+-   Pregunta: ¿Entre qué valores esperamos la calificación de *un
+    estudiante específico* que estudia $x_0$ horas?
+-   Considera tanto la incertidumbre del modelo como la variabilidad
+    individual
 
-**Diferencia clave:** El intervalo de predicción siempre es **más ancho** porque incluye la variabilidad $\sigma^2$ del error individual.
+**Diferencia clave:** El intervalo de predicción siempre es **más
+ancho** porque incluye la variabilidad $\sigma^2$ del error individual.
 
 # Fórmulas para Predicción
 
@@ -810,9 +896,11 @@ $$\hat{y}_0 \pm t_{\alpha/2, n-2} \cdot \sqrt{\text{MSE} \left( 1 + \frac{1}{n} 
 
 **Observaciones importantes:**
 
-- Ambos intervalos son más estrechos cerca del **centro** de los datos ($\bar{x}$)
-- La diferencia entre ambos es el término **"+1"** que representa $\sigma^2$
-- Nunca extrapolar más allá del rango de los datos observados
+-   Ambos intervalos son más estrechos cerca del **centro** de los datos
+    ($\bar{x}$)
+-   La diferencia entre ambos es el término **"+1"** que representa
+    $\sigma^2$
+-   Nunca extrapolar más allá del rango de los datos observados
 
 # Visualización de los Intervalos de Predicción
 
@@ -859,15 +947,17 @@ ggplot() +
 ::: {.column width="36%"}
 **Interpretación gráfica:**
 
-- **Banda azul (IC)**: Incertidumbre sobre la **media poblacional**
+-   **Banda azul (IC)**: Incertidumbre sobre la **media poblacional**
 
-- **Banda roja (IP)**: Incertidumbre para **nueva observación**
+-   **Banda roja (IP)**: Incertidumbre para **nueva observación**
 
-- **Diferencia clave**: IP incluye variabilidad individual ($\sigma^2$)
+-   **Diferencia clave**: IP incluye variabilidad individual
+    ($\sigma^2$)
 
-- **Patrón**: Ambos intervalos se estrechan cerca de $\bar{x}$
+-   **Patrón**: Ambos intervalos se estrechan cerca de $\bar{x}$
 
-- **Aplicación**: Usar IC para estimar tendencia, IP para predicciones individuales
+-   **Aplicación**: Usar IC para estimar tendencia, IP para predicciones
+    individuales
 :::
 :::::
 
@@ -875,54 +965,65 @@ ggplot() +
 
 **¿Por qué es crucial el diagnóstico?**
 
-El diagnóstico **NO es opcional**. Las inferencias estadísticas (p-valores, intervalos de confianza, predicciones) solo son válidas si se cumplen los supuestos del modelo.
+El diagnóstico **NO es opcional**. Las inferencias estadísticas
+(p-valores, intervalos de confianza, predicciones) solo son válidas si
+se cumplen los supuestos del modelo.
 
 **Consecuencias de ignorar el diagnóstico:**
 
-- **Estimadores sesgados** → Conclusiones erróneas
-- **Errores estándar incorrectos** → Intervalos de confianza y p-valores inválidos  
-- **Predicciones poco fiables** → Pérdida de poder predictivo
+-   **Estimadores sesgados** → Conclusiones erróneas
+-   **Errores estándar incorrectos** → Intervalos de confianza y
+    p-valores inválidos\
+-   **Predicciones poco fiables** → Pérdida de poder predictivo
 
-**Filosofía del diagnóstico:** Los residuos son la "ventana" hacia los errores verdaderos $\varepsilon_i$
+**Filosofía del diagnóstico:** Los residuos son la "ventana" hacia los
+errores verdaderos $\varepsilon_i$
 
 # Los Cuatro Pilares del Diagnóstico
 
 **Recordatorio de supuestos:**
 
-1. **Linealidad**: $E[Y_i | X_i] = \beta_0 + \beta_1 X_i$
-2. **Independencia**: $\text{Cov}(\varepsilon_i, \varepsilon_j) = 0$ para $i \neq j$
-3. **Homocedasticidad**: $Var(\varepsilon_i | X_i) = \sigma^2$ (varianza constante)
-4. **Normalidad**: $\varepsilon_i \sim N(0, \sigma^2)$ (para inferencia)
+1.  **Linealidad**: $E[Y_i | X_i] = \beta_0 + \beta_1 X_i$
+2.  **Independencia**: $\text{Cov}(\varepsilon_i, \varepsilon_j) = 0$
+    para $i \neq j$
+3.  **Homocedasticidad**: $Var(\varepsilon_i | X_i) = \sigma^2$
+    (varianza constante)
+4.  **Normalidad**: $\varepsilon_i \sim N(0, \sigma^2)$ (para
+    inferencia)
 
-**Herramienta fundamental:** Análisis de **residuos** ($e_i = y_i - \hat{y}_i$)
+**Herramienta fundamental:** Análisis de **residuos**
+($e_i = y_i - \hat{y}_i$)
 
-**Principio clave:** Si los supuestos se cumplen, los residuos deben comportarse como **ruido aleatorio** sin patrones sistemáticos
-
+**Principio clave:** Si los supuestos se cumplen, los residuos deben
+comportarse como **ruido aleatorio** sin patrones sistemáticos
 
 # Diagnóstico: Linealidad
 
-**Supuesto:** $E[Y | X] = \beta_0 + \beta_1 X$ (relación promedio es lineal)
+**Supuesto:** $E[Y | X] = \beta_0 + \beta_1 X$ (relación promedio es
+lineal)
 
 **Métodos de Diagnóstico:**
 
-- **Gráfico:** Residuos vs Valores Ajustados
-- **Test estadístico:** Test de Ramsey RESET (Regression Equation Specification Error Test)
+-   **Gráfico:** Residuos vs Valores Ajustados
+-   **Test estadístico:** Test de Ramsey RESET (Regression Equation
+    Specification Error Test)
 
 **¿Qué buscamos?**
 
-- **Patrón ideal:** Nube aleatoria de puntos centrada en cero
-- **Violación:** Patrón curvilíneo (forma de "U" o parábola)
+-   **Patrón ideal:** Nube aleatoria de puntos centrada en cero
+-   **Violación:** Patrón curvilíneo (forma de "U" o parábola)
 
 **Test de Ramsey RESET:**
 
-- H$_0$: La forma funcional es correcta (lineal)
-- H$_1$: La forma funcional es incorrecta (no lineal)
-- Añade términos $\hat{y}^2, \hat{y}^3, ...$ al modelo y testa su significancia
+-   H$_0$: La forma funcional es correcta (lineal)
+-   H$_1$: La forma funcional es incorrecta (no lineal)
+-   Añade términos $\hat{y}^2, \hat{y}^3, ...$ al modelo y testa su
+    significancia
 
 # Violación del supuesto: NO Linealidad
 
 ::::: columns
-:::: {.column width="65%"}
+::: {.column width="65%"}
 ```{r ejemplo-no-linealidad}
 #| fig-width: 5.5
 #| fig-height: 4
@@ -954,9 +1055,9 @@ ggplot(data.frame(ajustados = ajustados_malos, residuos = residuos_malos),
   theme_classic(base_size = 11) +
   theme(plot.title = element_text(size = 12))
 ```
-::::
-:::: {.column width="35%"}
+:::
 
+::: {.column width="35%"}
 \vspace{0.5cm}
 
 **Problema detectado:**
@@ -967,26 +1068,26 @@ Ajustar un modelo **lineal** a datos con relación **cuadrática**
 
 **¿Qué observamos?**
 
-- **Patrón curvo** en los residuos
-- Los residuos no están aleatoriamente dispersos
-- La línea suavizada (roja) no es horizontal
+-   **Patrón curvo** en los residuos
+-   Los residuos no están aleatoriamente dispersos
+-   La línea suavizada (roja) no es horizontal
 
 \vspace{0.5cm}
 
-**Diagnóstico:** 
+**Diagnóstico:**
 
 Patrón sistemático en residuos → **Violación de linealidad**
 
 \vspace{0.5cm}
 
 **Solución:** Considerar términos cuadráticos o transformaciones
-::::
+:::
 :::::
 
 # Verificación de linealidad
 
 ::::: columns
-:::: {.column width="65%"}
+::: {.column width="65%"}
 ```{r diagnostico-linealidad}
 #| fig-width: 5.5
 #| fig-height: 4
@@ -1016,9 +1117,9 @@ ggplot(datos_diag, aes(x = valores_ajustados, y = residuos)) +
 library(lmtest)
 reset_test <- resettest(modelo_estudio, power = 2:3, type = "fitted")
 ```
-::::
-:::: {.column width="35%"}
+:::
 
+::: {.column width="35%"}
 \vspace{0.5cm}
 
 **¿Qué evaluar?**
@@ -1027,14 +1128,13 @@ Si la relación es verdaderamente lineal
 
 \vspace{0.5cm}
 
+**Resultados:**
 
-**Resultados:** 
-
-- **Gráfico:** Línea roja prácticamente plana → Linealidad ✓
-- **Test RESET:** F = `r round(reset_test$statistic, 3)`, p = `r round(reset_test$p.value, 3)` → Forma funcional correcta
-::::
+-   **Gráfico:** Línea roja prácticamente plana → Linealidad ✓
+-   **Test RESET:** F = `r round(reset_test$statistic, 3)`, p =
+    `r round(reset_test$p.value, 3)` → Forma funcional correcta
+:::
 :::::
-
 
 # Diagnóstico: Homocedasticidad
 
@@ -1042,18 +1142,22 @@ Si la relación es verdaderamente lineal
 
 **Métodos de Diagnóstico:**
 
-- **Gráficos:** Scale-Location, Residuos vs Valores Ajustados
-- **Tests estadísticos:** Test de Breusch-Pagan, Test de Goldfeld-Quandt, Test de White
+-   **Gráficos:** Scale-Location, Residuos vs Valores Ajustados
+-   **Tests estadísticos:** Test de Breusch-Pagan, Test de
+    Goldfeld-Quandt, Test de White
 
 **¿Qué buscamos?**
 
-- **Patrón ideal:** Dispersión constante a lo largo del rango
-- **Violación:** Forma de "embudo" (dispersión creciente o decreciente)
+-   **Patrón ideal:** Dispersión constante a lo largo del rango
+-   **Violación:** Forma de "embudo" (dispersión creciente o
+    decreciente)
 
 **Tests de Heterocedasticidad:**
 
-- **Breusch-Pagan:** H$_0$: Homocedasticidad, H$_1$: Heterocedasticidad
-- **White:** Versión robusta que no asume forma específica de heterocedasticidad
+-   **Breusch-Pagan:** H$_0$: Homocedasticidad, H$_1$:
+    Heterocedasticidad
+-   **White:** Versión robusta que no asume forma específica de
+    heterocedasticidad
 
 # Violación del Supuesto: NO Homocedasticidad
 
@@ -1095,15 +1199,17 @@ ggplot(data.frame(ajustados = valores_ajustados_hetero, residuos_sqrt = residuos
 \vspace{0.5cm}
 
 ::: {.column width="35%"}
-**Problema:** Varianza de los errores que aumenta con los valores predichos (heterocedasticidad)
+**Problema:** Varianza de los errores que aumenta con los valores
+predichos (heterocedasticidad)
 
 **¿Qué observamos?**
 
-- **Línea roja ascendente**: Claro patrón de aumento de varianza
+-   **Línea roja ascendente**: Claro patrón de aumento de varianza
 
-- **Dispersión creciente**: Los residuos se dispersan más para valores altos
+-   **Dispersión creciente**: Los residuos se dispersan más para valores
+    altos
 
-- **Violación**: Supuesto de varianza constante **NO** se cumple
+-   **Violación**: Supuesto de varianza constante **NO** se cumple
 
 **Diagnóstico:** Tendencia creciente → **Heterocedasticidad**
 :::
@@ -1148,22 +1254,22 @@ white_test <- bptest(modelo_estudio, ~ fitted(modelo_estudio) + I(fitted(modelo_
 ::: {.column width="38%"}
 **Tests estadísticos:**
 
-**Breusch-Pagan:** 
+**Breusch-Pagan:**
 
-- LM = `r round(bp_test$statistic, 3)`
-- p = `r round(bp_test$p.value, 3)` 
-- **Conclusión**: Homocedasticidad ✓
+-   LM = `r round(bp_test$statistic, 3)`
+-   p = `r round(bp_test$p.value, 3)`
+-   **Conclusión**: Homocedasticidad ✓
 
-**White:** 
+**White:**
 
-- LM = `r round(white_test$statistic, 3)`
-- p = `r round(white_test$p.value, 3)` 
-- **Conclusión**: Varianza constante ✓
+-   LM = `r round(white_test$statistic, 3)`
+-   p = `r round(white_test$p.value, 3)`
+-   **Conclusión**: Varianza constante ✓
 
 **Interpretación gráfica:**
 
-- Línea roja horizontal → Varianza constante
-- Sin patrones sistemáticos → Supuesto cumplido
+-   Línea roja horizontal → Varianza constante
+-   Sin patrones sistemáticos → Supuesto cumplido
 :::
 :::::
 
@@ -1171,25 +1277,26 @@ white_test <- bptest(modelo_estudio, ~ fitted(modelo_estudio) + I(fitted(modelo_
 
 ::::: columns
 ::: {.column width="50%"}
-**Supuesto:** $\varepsilon_i \sim N(0, \sigma^2)$ (errores normalmente distribuidos)
+**Supuesto:** $\varepsilon_i \sim N(0, \sigma^2)$ (errores normalmente
+distribuidos)
 
 **Métodos de Diagnóstico:**
 
-**Gráficos:** 
+**Gráficos:**
 
-- Normal Q-Q Plot
-- Histograma de residuos
+-   Normal Q-Q Plot
+-   Histograma de residuos
 
-**Tests estadísticos:** 
+**Tests estadísticos:**
 
-- Test de Shapiro-Wilk
-- Test de Jarque-Bera 
-- Test de Anderson-Darling
+-   Test de Shapiro-Wilk
+-   Test de Jarque-Bera
+-   Test de Anderson-Darling
 
 **¿Qué buscamos en Q-Q Plot?**
 
-- **Ideal:** Puntos sobre la línea diagonal
-- **Problema:** Desviaciones sistemáticas
+-   **Ideal:** Puntos sobre la línea diagonal
+-   **Problema:** Desviaciones sistemáticas
 :::
 
 \vspace{0.5cm}
@@ -1199,18 +1306,18 @@ white_test <- bptest(modelo_estudio, ~ fitted(modelo_estudio) + I(fitted(modelo_
 
 **Shapiro-Wilk:**
 
-- H$_0$: Los residuos siguen distribución normal
-- Más potente para muestras pequeñas (n < 50)
+-   H$_0$: Los residuos siguen distribución normal
+-   Más potente para muestras pequeñas (n \< 50)
 
 **Jarque-Bera:**
 
-- Basado en asimetría y curtosis
-- Asintóticamente válido para muestras grandes
+-   Basado en asimetría y curtosis
+-   Asintóticamente válido para muestras grandes
 
 **Anderson-Darling:**
 
-- Más sensible en las colas de la distribución
-- Mejor detección de desviaciones extremas
+-   Más sensible en las colas de la distribución
+-   Mejor detección de desviaciones extremas
 :::
 :::::
 
@@ -1255,13 +1362,14 @@ ggplot(data.frame(residuos = residuos_sesgados), aes(sample = residuos)) +
 
 **¿Qué observamos?**
 
-- **Desviación sistemática**: Los puntos no siguen la línea diagonal
+-   **Desviación sistemática**: Los puntos no siguen la línea diagonal
 
-- **Curvatura**: Patrón curvo indica distribución sesgada
+-   **Curvatura**: Patrón curvo indica distribución sesgada
 
-- **Violación**: Supuesto de normalidad **NO** se cumple
+-   **Violación**: Supuesto de normalidad **NO** se cumple
 
-**Diagnóstico:** Puntos se alejan sistemáticamente de la línea → **NO normalidad**
+**Diagnóstico:** Puntos se alejan sistemáticamente de la línea → **NO
+normalidad**
 :::
 :::::
 
@@ -1296,15 +1404,17 @@ shapiro_malo <- shapiro.test(residuos_sesgados)
 \vspace{0.5cm}
 
 ::: {.column width="36%"}
-**Problema:** Distribución asimétrica de los residuos (histograma sesgado)
+**Problema:** Distribución asimétrica de los residuos (histograma
+sesgado)
 
 **¿Qué observamos?**
 
-- **Asimetría**: Distribución sesgada hacia la derecha
+-   **Asimetría**: Distribución sesgada hacia la derecha
 
-- **Desajuste**: Curva normal (azul) no coincide con histograma
+-   **Desajuste**: Curva normal (azul) no coincide con histograma
 
-- **Test Shapiro-Wilk**: p = `r round(shapiro_malo$p.value, 3)` < 0.05
+-   **Test Shapiro-Wilk**: p = `r round(shapiro_malo$p.value, 3)` \<
+    0.05
 
 **Diagnóstico:** Distribución sesgada ≠ curva normal → **NO normalidad**
 :::
@@ -1347,21 +1457,21 @@ jb_test <- jarque.bera.test(residuals(modelo_estudio))
 ::: {.column width="38%"}
 **Tests estadísticos:**
 
-**Shapiro-Wilk:** 
+**Shapiro-Wilk:**
 
-- W = `r round(sw_test$statistic, 3)`
-- p = `r round(sw_test$p.value, 3)`
-- **Conclusión**: Normalidad ✓
+-   W = `r round(sw_test$statistic, 3)`
+-   p = `r round(sw_test$p.value, 3)`
+-   **Conclusión**: Normalidad ✓
 
-**Jarque-Bera:** 
+**Jarque-Bera:**
 
-- JB = `r round(jb_test$statistic, 3)`
-- p = `r round(jb_test$p.value, 3)`
-- **Conclusión**: Normalidad ✓
+-   JB = `r round(jb_test$statistic, 3)`
+-   p = `r round(jb_test$p.value, 3)`
+-   **Conclusión**: Normalidad ✓
 
 **Interpretación gráfica:**
 
-- Puntos siguen la línea diagonal → Normalidad cumplida
+-   Puntos siguen la línea diagonal → Normalidad cumplida
 :::
 :::::
 
@@ -1398,37 +1508,44 @@ ggplot(data.frame(residuos = residuos), aes(x = residuos)) +
 \vspace{0.5cm}
 
 ::: {.column width="36%"}
-**Complemento visual:** Histograma de residuos con curva normal superpuesta
+**Complemento visual:** Histograma de residuos con curva normal
+superpuesta
 
 **¿Qué buscamos?**
 
-- **Patrón ideal:** Distribución simétrica y campaniforme
+-   **Patrón ideal:** Distribución simétrica y campaniforme
 
-- **Violación:** Asimetría marcada o múltiples modas
+-   **Violación:** Asimetría marcada o múltiples modas
 
-**Resultado:** Distribución simétrica y campaniforme → Normalidad confirmada
+**Resultado:** Distribución simétrica y campaniforme → Normalidad
+confirmada
 :::
 :::::
 
 # Diagnóstico: Independencia
 
-**Supuesto:** $Cov(\varepsilon_i, \varepsilon_j) = 0$ para $i \neq j$ (errores independientes)
+**Supuesto:** $Cov(\varepsilon_i, \varepsilon_j) = 0$ para $i \neq j$
+(errores independientes)
 
 **Métodos de Diagnóstico:**
 
-- **Gráfico:** Residuos vs Orden de observación
-- **Tests estadísticos:** Test de Durbin-Watson, Test de Breusch-Godfrey (LM), Ljung-Box
+-   **Gráfico:** Residuos vs Orden de observación
+-   **Tests estadísticos:** Test de Durbin-Watson, Test de
+    Breusch-Godfrey (LM), Ljung-Box
 
 **¿Qué buscamos?**
 
-- **Patrón ideal:** Residuos sin patrones temporales o secuenciales
-- **Violación:** Tendencias, ciclos, o correlaciones entre residuos consecutivos
+-   **Patrón ideal:** Residuos sin patrones temporales o secuenciales
+-   **Violación:** Tendencias, ciclos, o correlaciones entre residuos
+    consecutivos
 
 **Tests de Autocorrelación:**
 
-- **Durbin-Watson:** H$_0$: No hay autocorrelación de primer orden ($\rho = 0$)
-- **Breusch-Godfrey:** Generaliza DW para órdenes superiores y regresores retardados
-- **Ljung-Box:** Testa autocorrelación conjunta en múltiples retardos
+-   **Durbin-Watson:** H$_0$: No hay autocorrelación de primer orden
+    ($\rho = 0$)
+-   **Breusch-Godfrey:** Generaliza DW para órdenes superiores y
+    regresores retardados
+-   **Ljung-Box:** Testa autocorrelación conjunta en múltiples retardos
 
 # Violación del Supuesto: NO Independencia
 
@@ -1479,11 +1596,12 @@ ggplot(data.frame(orden = 1:n_tiempo, residuos = residuos_tiempo),
 
 **¿Qué observamos?**
 
-- **Patrones sistemáticos**: Los residuos muestran tendencias claras
-- **Conexiones**: Residuos consecutivos están correlacionados
-- **Violación**: Supuesto de independencia **NO** se cumple
+-   **Patrones sistemáticos**: Los residuos muestran tendencias claras
+-   **Conexiones**: Residuos consecutivos están correlacionados
+-   **Violación**: Supuesto de independencia **NO** se cumple
 
-**Diagnóstico:** Patrones sistemáticos y tendencias → **NO independencia**
+**Diagnóstico:** Patrones sistemáticos y tendencias → **NO
+independencia**
 :::
 :::::
 
@@ -1527,45 +1645,49 @@ bg_test <- bgtest(modelo_estudio, order = 2)
 ::: {.column width="38%"}
 **Tests estadísticos:**
 
-**Durbin-Watson:** 
+**Durbin-Watson:**
 
-- DW = `r round(dw_test$statistic, 3)`
-- p = `r round(dw_test$p.value, 3)`
-- **Conclusión**: Sin autocorrelación orden 1 ✓
+-   DW = `r round(dw_test$statistic, 3)`
+-   p = `r round(dw_test$p.value, 3)`
+-   **Conclusión**: Sin autocorrelación orden 1 ✓
 
-**Breusch-Godfrey:** 
+**Breusch-Godfrey:**
 
-- LM = `r round(bg_test$statistic, 3)`
-- p = `r round(bg_test$p.value, 3)`
-- **Conclusión**: Sin autocorrelación orden 2 ✓
+-   LM = `r round(bg_test$statistic, 3)`
+-   p = `r round(bg_test$p.value, 3)`
+-   **Conclusión**: Sin autocorrelación orden 2 ✓
 
 **Interpretación gráfica:**
 
-- Sin patrones temporales → Independencia cumplida
+-   Sin patrones temporales → Independencia cumplida
 :::
 :::::
 
 # Diagnóstico 5: Observaciones Influyentes
 
-**Objetivo:** Identificar puntos que tienen influencia desproporcionada en el modelo
+**Objetivo:** Identificar puntos que tienen influencia desproporcionada
+en el modelo
 
 **Métricas Principales:**
 
-- **Leverage** ($h_{ii}$): Distancia en el espacio X (valores atípicos en X)
-- **Residuos Estudentizados**: Outliers en Y ajustado por su varianza
-- **Distancia de Cook** ($D_i$): Influencia global en los coeficientes
+-   **Leverage** ($h_{ii}$): Distancia en el espacio X (valores atípicos
+    en X)
+-   **Residuos Estudentizados**: Outliers en Y ajustado por su varianza
+-   **Distancia de Cook** ($D_i$): Influencia global en los coeficientes
 
 **Umbrales de Referencia:**
 
-- **Leverage:** $h_{ii} > \frac{2(k+1)}{n}$ (k = número de predictores)
-- **Cook:** $D_i > \frac{4}{n-k-1}$ (regla conservadora)
-- **Residuos:** $|t_i| > 2$ (fuera de 2 desviaciones estándar)
+-   **Leverage:** $h_{ii} > \frac{2(k+1)}{n}$ (k = número de
+    predictores)
+-   **Cook:** $D_i > \frac{4}{n-k-1}$ (regla conservadora)
+-   **Residuos:** $|t_i| > 2$ (fuera de 2 desviaciones estándar)
 
 **Combinaciones Problemáticas:**
 
-- Alto leverage + alto residuo = **Muy influyente**
-- Alto leverage + bajo residuo = **Punto de anclaje** (puede ser bueno)
-- Bajo leverage + alto residuo = **Outlier sin influencia**
+-   Alto leverage + alto residuo = **Muy influyente**
+-   Alto leverage + bajo residuo = **Punto de anclaje** (puede ser
+    bueno)
+-   Bajo leverage + alto residuo = **Outlier sin influencia**
 
 # Diagnóstico: Observaciones Influyentes
 
@@ -1657,16 +1779,20 @@ num_outliers <- length(outliers_stud)
 ::: {.column width="34%"}
 **Resultados:**
 
-- **Leverage máximo:** `r round(max_leverage, 3)` (umbral: `r round(leverage_threshold, 3)`)
-- **Cook máximo:** `r round(max_cook, 3)` (umbral: `r round(cook_threshold, 3)`) 
-- **Outliers (|t| > 2):** `r num_outliers` observaciones
-- **Conclusión:** `r if(length(c(high_leverage, high_cook)) == 0) "Sin observaciones influyentes" else paste("Revisar observaciones:", paste(unique(c(high_leverage, high_cook)), collapse = ", "))`
+-   **Leverage máximo:** `r round(max_leverage, 3)` (umbral:
+    `r round(leverage_threshold, 3)`)
+-   **Cook máximo:** `r round(max_cook, 3)` (umbral:
+    `r round(cook_threshold, 3)`)
+-   **Outliers (\|t\| \> 2):** `r num_outliers` observaciones
+-   **Conclusión:**
+    `r if(length(c(high_leverage, high_cook)) == 0) "Sin observaciones influyentes" else paste("Revisar observaciones:", paste(unique(c(high_leverage, high_cook)), collapse = ", "))`
 
 **Interpretación por zonas:**
 
-- **Derecha:** Alto leverage → Potencial influencia
-- **Arriba/Abajo:** Outliers → Residuos grandes
-- **Esquinas:** `r if(length(intersect(high_leverage, outliers_stud)) == 0) "¡Vacías! ✓" else "¡Ocupadas! ⚠️"`
+-   **Derecha:** Alto leverage → Potencial influencia
+-   **Arriba/Abajo:** Outliers → Residuos grandes
+-   **Esquinas:**
+    `r if(length(intersect(high_leverage, outliers_stud)) == 0) "¡Vacías! ✓" else "¡Ocupadas! ⚠️"`
 :::
 :::::
 
@@ -1674,17 +1800,21 @@ num_outliers <- length(outliers_stud)
 
 **Identificación:**
 
-- **Outliers:** `r if(length(outliers_stud) > 0) paste("observaciones", paste(outliers_stud, collapse = ", ")) else "Ninguno"`
-- **Alto leverage:** `r if(length(high_leverage) > 0) paste("observaciones", paste(high_leverage, collapse = ", ")) else "Ninguno"`
+-   **Outliers:**
+    `r if(length(outliers_stud) > 0) paste("observaciones", paste(outliers_stud, collapse = ", ")) else "Ninguno"`
+-   **Alto leverage:**
+    `r if(length(high_leverage) > 0) paste("observaciones", paste(high_leverage, collapse = ", ")) else "Ninguno"`
 
 **Interpretación por regiones:**
 
-- **Zona derecha:** Alto leverage (X atípicos) → Potencial influyente
-- **Zona izquierda:** Outliers (Y atípicos) → Residuos grandes  
-- **Esquinas críticas:** `r if(length(intersect(high_leverage, outliers_stud)) == 0) "¡Vacías! (Situación favorable)" else "¡Ocupadas! (Muy problemático)"`
-- **Distancia de Cook:** Influencia moderada (< 1.0)
+-   **Zona derecha:** Alto leverage (X atípicos) → Potencial influyente
+-   **Zona izquierda:** Outliers (Y atípicos) → Residuos grandes\
+-   **Esquinas críticas:**
+    `r if(length(intersect(high_leverage, outliers_stud)) == 0) "¡Vacías! (Situación favorable)" else "¡Ocupadas! (Muy problemático)"`
+-   **Distancia de Cook:** Influencia moderada (\< 1.0)
 
-**Conclusión:** `r if(length(intersect(high_leverage, outliers_stud)) == 0) "No hay solapamiento leverage + outlier → Situación manejable" else "Hay solapamiento leverage + outlier → Situación crítica"`
+**Conclusión:**
+`r if(length(intersect(high_leverage, outliers_stud)) == 0) "No hay solapamiento leverage + outlier → Situación manejable" else "Hay solapamiento leverage + outlier → Situación crítica"`
 
 # Diagnóstico DFFITS
 
@@ -1739,14 +1869,22 @@ top_indices <- order(abs(dffits_vals), decreasing = TRUE)[1:5]
 
 **Resultados cuantitativos:**
 
-- **Umbral:** `r round(dffits_threshold, 3)`
-- **Influyentes:** `r length(influential_dffits)` observaciones (`r paste(influential_dffits, collapse = ", ")`)
-- **Top 5 |DFFITS|:** obs. `r paste(top_indices, collapse = ", ")` 
-- **Valores:** `r paste(round(dffits_vals[top_indices], 3), collapse = ", ")`
-**Interpretación:**
-- **Obs. `r top_indices[1]`:** DFFITS = `r round(dffits_vals[top_indices[1]], 3)` (más influyente)
+-   **Umbral:** `r round(dffits_threshold, 3)`
 
-- **Conclusión:** `r length(influential_dffits)` observaciones cambían significativamente sus propias predicciones
+-   **Influyentes:** `r length(influential_dffits)` observaciones
+    (`r paste(influential_dffits, collapse = ", ")`)
+
+-   **Top 5 \|DFFITS\|:** obs. `r paste(top_indices, collapse = ", ")`
+
+-   **Valores:**
+    `r paste(round(dffits_vals[top_indices], 3), collapse = ", ")`
+    **Interpretación:**
+
+-   **Obs. `r top_indices[1]`:** DFFITS =
+    `r round(dffits_vals[top_indices[1]], 3)` (más influyente)
+
+-   **Conclusión:** `r length(influential_dffits)` observaciones cambían
+    significativamente sus propias predicciones
 :::
 :::::
 
@@ -1756,46 +1894,60 @@ top_indices <- order(abs(dffits_vals), decreasing = TRUE)[1:5]
 
 **Resultados cuantitativos:**
 
-- **Umbral de influencia:** `r round(dffits_threshold, 3)`
-- **Observaciones influyentes:** `r length(influential_dffits)` observaciones (`r paste(influential_dffits, collapse = ", ")`)
-- **Top 5 |DFFITS|:** observaciones `r paste(top_indices, collapse = ", ")` 
-- **Valores:** `r paste(round(dffits_vals[top_indices], 3), collapse = ", ")`
+-   **Umbral de influencia:** `r round(dffits_threshold, 3)`
+-   **Observaciones influyentes:** `r length(influential_dffits)`
+    observaciones (`r paste(influential_dffits, collapse = ", ")`)
+-   **Top 5 \|DFFITS\|:** observaciones
+    `r paste(top_indices, collapse = ", ")`
+-   **Valores:**
+    `r paste(round(dffits_vals[top_indices], 3), collapse = ", ")`
 
 **Interpretación:**
 
-- **Observación `r top_indices[1]`:** DFFITS = `r round(dffits_vals[top_indices[1]], 3)` (la más influyente)
-- **Conclusión:** `r length(influential_dffits)` observaciones cambian significativamente sus propias predicciones → Investigar casos especiales
+-   **Observación `r top_indices[1]`:** DFFITS =
+    `r round(dffits_vals[top_indices[1]], 3)` (la más influyente)
+-   **Conclusión:** `r length(influential_dffits)` observaciones cambian
+    significativamente sus propias predicciones → Investigar casos
+    especiales
 
 # Diagnóstico Completo: Supuestos Básicos
 
 **Ejemplo:** Modelo `horas_estudio ~ nota_examen` (n=100)
 
-**1. LINEALIDAD:** [OK] CUMPLIDO
+**1. LINEALIDAD:** \[OK\] CUMPLIDO
 
-- **Gráfico:** Línea loess prácticamente plana en Residuos vs Ajustados
-- **Test RESET:** F = `r round(reset_test$statistic, 3)`, p = `r round(reset_test$p.value, 3)` → Forma funcional correcta
+-   **Gráfico:** Línea loess prácticamente plana en Residuos vs
+    Ajustados
+-   **Test RESET:** F = `r round(reset_test$statistic, 3)`, p =
+    `r round(reset_test$p.value, 3)` → Forma funcional correcta
 
-**2. HOMOCEDASTICIDAD:** [OK] CUMPLIDO
+**2. HOMOCEDASTICIDAD:** \[OK\] CUMPLIDO
 
-- **Scale-Location:** Línea horizontal, dispersión constante
-- **Breusch-Pagan:** LM = `r round(bp_test$statistic, 3)`, p = `r round(bp_test$p.value, 3)` → Varianza constante
-- **White:** LM = `r round(white_test$statistic, 3)`, p = `r round(white_test$p.value, 3)` → Confirmado
+-   **Scale-Location:** Línea horizontal, dispersión constante
+-   **Breusch-Pagan:** LM = `r round(bp_test$statistic, 3)`, p =
+    `r round(bp_test$p.value, 3)` → Varianza constante
+-   **White:** LM = `r round(white_test$statistic, 3)`, p =
+    `r round(white_test$p.value, 3)` → Confirmado
 
 # Diagnóstico Completo: Supuestos Distribucionales
 
 **Ejemplo:** Modelo `horas_estudio ~ nota_examen` (n=100)
 
-**3. NORMALIDAD:** [OK] CUMPLIDO
+**3. NORMALIDAD:** \[OK\] CUMPLIDO
 
-- **Q-Q Plot:** Puntos siguen línea diagonal perfectamente
-- **Shapiro-Wilk:** W = `r round(sw_test$statistic, 3)`, p = `r round(sw_test$p.value, 3)` → Normalidad confirmada
-- **Jarque-Bera:** JB = `r round(jb_test$statistic, 3)`, p = `r round(jb_test$p.value, 3)` → Distribución normal
+-   **Q-Q Plot:** Puntos siguen línea diagonal perfectamente
+-   **Shapiro-Wilk:** W = `r round(sw_test$statistic, 3)`, p =
+    `r round(sw_test$p.value, 3)` → Normalidad confirmada
+-   **Jarque-Bera:** JB = `r round(jb_test$statistic, 3)`, p =
+    `r round(jb_test$p.value, 3)` → Distribución normal
 
-**4. INDEPENDENCIA:** [OK] CUMPLIDO
+**4. INDEPENDENCIA:** \[OK\] CUMPLIDO
 
-- **Residuos vs Orden:** Sin patrones temporales o secuenciales
-- **Durbin-Watson:** DW = `r round(dw_test$statistic, 3)`, p = `r round(dw_test$p.value, 3)` → Sin autocorrelación
-- **Breusch-Godfrey:** LM = `r round(bg_test$statistic, 3)`, p = `r round(bg_test$p.value, 3)` → Independencia confirmada
+-   **Residuos vs Orden:** Sin patrones temporales o secuenciales
+-   **Durbin-Watson:** DW = `r round(dw_test$statistic, 3)`, p =
+    `r round(dw_test$p.value, 3)` → Sin autocorrelación
+-   **Breusch-Godfrey:** LM = `r round(bg_test$statistic, 3)`, p =
+    `r round(bg_test$p.value, 3)` → Independencia confirmada
 
 # Diagnóstico Completo: Observaciones Influyentes
 
@@ -1803,60 +1955,72 @@ top_indices <- order(abs(dffits_vals), decreasing = TRUE)[1:5]
 
 **DETECCIÓN DE PUNTOS PROBLEMÁTICOS:**
 
-- **Outliers:** `r num_outliers` observaciones con |t| > 2
-- **Alto Leverage:** `r length(high_leverage)` observaciones de alta palanca  
-- **DFFITS influyentes:** `r length(influential_dffits)` observaciones que cambian sus predicciones
-- **Cook influyentes:** `r length(high_cook)` observaciones con alta influencia global
+-   **Outliers:** `r num_outliers` observaciones con \|t\| \> 2
+-   **Alto Leverage:** `r length(high_leverage)` observaciones de alta
+    palanca\
+-   **DFFITS influyentes:** `r length(influential_dffits)` observaciones
+    que cambian sus predicciones
+-   **Cook influyentes:** `r length(high_cook)` observaciones con alta
+    influencia global
 
 **EVALUACIÓN DE RIESGO:**
 
-- **Situación:** `r if(length(intersect(high_leverage, outliers_stud)) == 0) "[OK] Favorable - Sin solapamiento crítico leverage + outlier" else "[ALERTA] Crítica - Hay solapamiento leverage + outlier"`
-- **Acción:** `r if(length(unique(c(high_leverage, influential_dffits, high_cook))) == 0) "Ninguna acción necesaria" else paste("Revisar", length(unique(c(high_leverage, influential_dffits, high_cook))), "observaciones específicas")`
+-   **Situación:**
+    `r if(length(intersect(high_leverage, outliers_stud)) == 0) "[OK] Favorable - Sin solapamiento crítico leverage + outlier" else "[ALERTA] Crítica - Hay solapamiento leverage + outlier"`
+-   **Acción:**
+    `r if(length(unique(c(high_leverage, influential_dffits, high_cook))) == 0) "Ninguna acción necesaria" else paste("Revisar", length(unique(c(high_leverage, influential_dffits, high_cook))), "observaciones específicas")`
 
 # Veredicto Final del Diagnóstico
 
 **Ejemplo:** Modelo `horas_estudio ~ nota_examen` (n=100)
 
-
 **Interpretación completa:**
 
-- Por cada **hora adicional** de estudio, la calificación aumenta en promedio **`r round(coef(modelo_estudio)[2], 3)` puntos**
-- El modelo explica el **`r round(summary(modelo_estudio)$r.squared * 100, 1)`%** de la variabilidad en las calificaciones  
-- La relación es **altamente significativa** (p < 0.001)
-- Todos los **supuestos se cumplen** → Las inferencias son válidas
-- Existen obsrevaciones influyentes que requieren atención
+-   Por cada **hora adicional** de estudio, la calificación aumenta en
+    promedio **`r round(coef(modelo_estudio)[2], 3)` puntos**
+-   El modelo explica el
+    **`r round(summary(modelo_estudio)$r.squared * 100, 1)`%** de la
+    variabilidad en las calificaciones\
+-   La relación es **altamente significativa** (p \< 0.001)
+-   Todos los **supuestos se cumplen** → Las inferencias son válidas
+-   Existen obsrevaciones influyentes que requieren atención
 
 # Conclusiones y Próximos Pasos
 
 **Lo que hemos aprendido:**
 
- **Proceso completo** de modelado: exploración → formalización → estimación → inferencia → diagnóstico
+**Proceso completo** de modelado: exploración → formalización →
+estimación → inferencia → diagnóstico
 
- **Interpretación** de coeficientes y medidas de bondad de ajuste
+**Interpretación** de coeficientes y medidas de bondad de ajuste
 
- **Validación** mediante diagnóstico de supuestos
+**Validación** mediante diagnóstico de supuestos
 
- **Limitaciones** de la correlación vs. causalidad
+**Limitaciones** de la correlación vs. causalidad
 
 **Próximo tema: Regresión Lineal Múltiple**
 
-- Múltiples variables predictoras
-- Control de variables confusas
-- Interacciones entre predictores
-- Selección de variables
+-   Múltiples variables predictoras
+-   Control de variables confusas
+-   Interacciones entre predictores
+-   Selección de variables
 
-**La regresión simple es el fundamento** → Todos estos conceptos escalan directamente
+**La regresión simple es el fundamento** → Todos estos conceptos escalan
+directamente
 
 # Referencias
 
-- Draper, N. R., & Smith, H. (1998). *Applied regression analysis* (3rd ed.). Wiley.
+-   Draper, N. R., & Smith, H. (1998). *Applied regression analysis*
+    (3rd ed.). Wiley.
 
-- Fox, J., & Weisberg, S. (2018). *An R companion to applied regression* (3rd ed.). Sage.
+-   Fox, J., & Weisberg, S. (2018). *An R companion to applied
+    regression* (3rd ed.). Sage.
 
-- Harrell Jr, F. E. (2015). *Regression modeling strategies* (2nd ed.). Springer.
+-   Harrell Jr, F. E. (2015). *Regression modeling strategies* (2nd
+    ed.). Springer.
 
-- James, G., Witten, D., Hastie, T., & Tibshirani, R. (2021). *An introduction to statistical learning* (2nd ed.). Springer.
+-   James, G., Witten, D., Hastie, T., & Tibshirani, R. (2021). *An
+    introduction to statistical learning* (2nd ed.). Springer.
 
-- Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2005). *Applied linear statistical models* (5th ed.). McGraw-Hill/Irwin.
-
-
+-   Kutner, M. H., Nachtsheim, C. J., Neter, J., & Li, W. (2005).
+    *Applied linear statistical models* (5th ed.). McGraw-Hill/Irwin.
