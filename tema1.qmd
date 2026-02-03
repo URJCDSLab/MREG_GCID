@@ -675,6 +675,17 @@ fundamental tener en cuenta las siguientes observaciones:
     conclusión errónea de que el predictor no es útil.
 :::
 
+
+::: {.callout-important title="Para pensar"}
+
+En regresión simple, $R^2$ mide la proporción de variabilidad de $Y$ explicada por el modelo con una sola $X$.  
+**Pregunta:** si, además de esa $X$, pudieras añadir una segunda variable $Z$ que en realidad no tiene relación con $Y$ (por ejemplo, puro ruido), ¿crees que el $R^2$ del modelo con $X$ y $Z$ podría ser menor que el del modelo con solo $X$? Puedes hacer simulaciones si te ayuda a pensar.
+:::
+
+
+
+
+
 ### Inferencia sobre los coeficientes
 
 Además de la prueba F global, podemos realizar inferencias sobre cada
@@ -695,8 +706,8 @@ el **error estándar** del estimador $\hat{\beta}_1$.
 
 #### Contraste de hipótesis para la pendiente
 
-El contraste más común es el de la significancia de la pendiente: \*
-$H_0: \beta_1 = 0$ \* $H_1: \beta_1 \neq 0$
+El contraste más común es el de la significancia de la pendiente: 
+$$ H_0: \beta_1 = 0 \text{ vs } H_1: \beta_1 \neq 0 $$
 
 Bajo $H_0$, el estadístico de contraste es: $$
 t_0 = \frac{\hat{\beta}_1}{\text{SE}(\hat{\beta}_1)}$$
@@ -747,8 +758,7 @@ summary(modelo_estudio)
     `r round(summary(modelo_estudio)$r.squared*100, 0)`% de la
     variabilidad en las calificaciones es explicada por el tiempo de
     estudio.
--   **F-statistic**: El p-valor del estadístico F
-    (`r format.pval(summary(modelo_estudio)$fstatistic[3], digits=3, eps=0.001)`)
+-   **F-statistic**: El p-valor del estadístico F es $<0.001$, esto
     confirma que el modelo en su conjunto es estadísticamente
     significativo.
 :::
@@ -792,8 +802,7 @@ centro de los datos y más ancho en los extremos.
 ### Intervalo de predicción para una respuesta individual
 
 Este intervalo es el que debemos usar cuando queremos predecir el valor
-para **una única observación futura**, no para la media. Como indicas,
-este intervalo debe tener en cuenta dos fuentes de variabilidad:
+para **una única observación futura**, no para la media. Este intervalo debe tener en cuenta dos fuentes de variabilidad:
 
 1.  La incertidumbre sobre la localización de la verdadera recta de
     regresión (la misma que en el intervalo de confianza).
