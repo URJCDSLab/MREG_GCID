@@ -1,7 +1,7 @@
 ---
 title: "Laboratorio 1: Introducción a R y Análisis Estadístico"
-subtitle: "Modelos Estadísticos de Predicción"
-author: "Víctor Aceña Gil - Isaac Martín de Diego"
+subtitle: "Modelos de Regresión"
+author: "Carmen Lancho Martín - Natalia Madrueño Sierro"
 date: today
 format: 
   html:
