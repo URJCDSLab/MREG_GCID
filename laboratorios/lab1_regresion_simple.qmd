@@ -1,7 +1,7 @@
 ---
 title: "Laboratorio 2: Regresión Lineal Simple"
-subtitle: "Modelos Estadísticos de Predicción"
-author: "Víctor Aceña Gil - Isaac Martín de Diego"
+subtitle: "Modelos de Regresión"
+author: "Carmen Lancho Martín - Natalia Madrueño Sierro"
 date: today
 format: 
   html:
@@ -15,9 +15,7 @@ execute:
   message: false
 ---
 
-## Objetivos del Laboratorio
-
-Al finalizar este laboratorio, serás capaz de:
+## Objetivos del laboratorio
 
 - Ajustar modelos de regresión lineal simple en R
 - Interpretar coeficientes y su significancia estadística
@@ -25,7 +23,7 @@ Al finalizar este laboratorio, serás capaz de:
 - Verificar los supuestos de la regresión lineal
 - Realizar predicciones con el modelo ajustado
 
-## Configuración Inicial
+## Configuración inicial
 
 ```{r setup}
 # Cargar librerías necesarias
@@ -41,7 +39,7 @@ set.seed(42)  # Para reproducibilidad
 
 ## Parte 1: Fundamentos de la Regresión Lineal Simple
 
-### Modelo Teórico
+### Modelo teórico
 
 La regresión lineal simple modela la relación entre una variable dependiente $Y$ y una variable independiente $X$:
 
@@ -52,7 +50,7 @@ Donde:
 - $\beta_1$ = pendiente (cambio en Y por unidad de cambio en X)
 - $\epsilon$ = error aleatorio
 
-### Ejemplo Básico con Datos Simulados
+### Ejemplo básico con datos simulados
 
 ```{r basic_example}
 # Generar datos simulados
@@ -78,7 +76,7 @@ modelo_sim <- lm(y ~ x, data = datos_sim)
 summary(modelo_sim)
 ```
 
-### Interpretación de Resultados
+### Interpretación de resultados
 
 ```{r interpretation}
 # Extraer coeficientes
@@ -101,9 +99,9 @@ cat("\nR²:", round(r_squared, 3))
 cat("\n", round(r_squared*100, 1), "% de la variabilidad en Y es explicada por X\n")
 ```
 
-## Parte 2: Ejemplo Real - Relación Peso y Consumo de Combustible
+## Parte 2: Ejemplo real - Relación peso y consumo de combustible
 
-### Análisis Exploratorio
+### Análisis exploratorio
 
 ```{r mtcars_exploration}
 # Usar dataset mtcars
@@ -122,7 +120,7 @@ correlation <- cor(mtcars$wt, mtcars$mpg)
 cat("Correlación entre peso y MPG:", round(correlation, 3))
 ```
 
-### Ajuste del Modelo
+### Ajuste del modelo
 
 ```{r model_fitting}
 # Ajustar modelo de regresión
@@ -141,7 +139,7 @@ tidy(modelo_mpg)
 glance(modelo_mpg)
 ```
 
-### Análisis Detallado de Resultados
+### Análisis detallado de resultados
 
 ```{r detailed_analysis}
 # Extraer elementos clave
@@ -176,7 +174,7 @@ cat("Por cada 1000 lbs adicionales de peso, el consumo disminuye en",
 cat("El", round(r_squared*100, 1), "% de la variación en el consumo se explica por el peso\n")
 ```
 
-### Visualización del Modelo Ajustado
+### Visualización del modelo ajustado
 
 ```{r model_visualization}
 # Gráfico con línea de regresión y bandas de confianza
@@ -200,9 +198,9 @@ last_plot() +
            size = 4, color = "blue", fontface = "bold")
 ```
 
-## Parte 3: Diagnóstico del Modelo
+## Parte 3: diagnóstico del modelo
 
-### Análisis de Residuos
+### Análisis de residuos
 
 ```{r residual_analysis}
 # Obtener residuos y valores ajustados
@@ -243,7 +241,7 @@ p4 <- ggplot(modelo_data, aes(x = .hat, y = .std.resid)) +
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 ```
 
-### Tests de Supuestos
+### Tests de supuestos
 
 ```{r assumption_tests}
 # Test de normalidad de residuos (Shapiro-Wilk)
@@ -280,7 +278,7 @@ print(rownames(mtcars)[influential_points])
 
 ## Parte 4: Predicciones
 
-### Realizar Predicciones
+### Realizar predicciones
 
 ```{r predictions}
 # Predicciones para nuevos valores
@@ -308,7 +306,7 @@ tabla_predicciones <- data.frame(
 print(tabla_predicciones)
 ```
 
-### Visualización de Intervalos
+### Visualización de intervalos
 
 ```{r prediction_intervals}
 # Crear secuencia fina de valores para graficar
@@ -347,7 +345,7 @@ ggplot() +
   theme_minimal()
 ```
 
-## Parte 5: Ejercicios Prácticos
+## Parte 5: Ejercicios prácticos
 
 ### Ejercicio 1: Dataset Boston
 
@@ -377,7 +375,7 @@ ggplot(Boston, aes(x = rm, y = medv)) +
 # Continúa el análisis...
 ```
 
-### Ejercicio 2: Datos Personalizados
+### Ejercicio 2: Datos personalizados
 
 ```{r exercise_custom}
 # Crear tu propio dataset
@@ -402,7 +400,7 @@ datos_estudio <- data.frame(
 # Tu código aquí:
 ```
 
-### Ejercicio 3: Comparación de Modelos
+### Ejercicio 3: Comparación de modelos
 
 ```{r exercise_comparison}
 # Usar el dataset cars (velocidad vs distancia de frenado)
@@ -421,9 +419,9 @@ data(cars)
 # Tu código aquí:
 ```
 
-## Parte 6: Conceptos Clave para Recordar
+## Parte 6: Conceptos clave
 
-### Interpretación de Coeficientes
+### Interpretación de coeficientes
 
 - **Intercepto (β₀)**: Valor esperado de Y cuando X = 0
 - **Pendiente (β₁)**: Cambio promedio en Y por unidad de cambio en X
@@ -436,13 +434,10 @@ data(cars)
 3. **Homocedasticidad**: Varianza constante de errores
 4. **Normalidad**: Errores siguen distribución normal
 
-### Diagnósticos Importantes
+### Diagnósticos importantes
 
 - **Residuos vs Ajustados**: Detecta no linealidad y heterocedasticidad
 - **Q-Q Plot**: Evalúa normalidad de residuos
 - **Scale-Location**: Evalúa homocedasticidad
 - **Residuos vs Leverage**: Identifica puntos influyentes
 
-## Próximo Laboratorio
-
-En el Laboratorio 3 expandiremos a regresión lineal múltiple, incluyendo selección de variables y manejo de multicolinealidad.
