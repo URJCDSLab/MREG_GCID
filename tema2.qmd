@@ -374,7 +374,7 @@ Este output nos muestra:
     errores estándar
 -   **Estadísticos t** y p-valores para cada coeficiente
 -   **Error estándar residual**
-    ($\hat{\sigma}$ = `r summary(modelo)$sigma` euros)
+    ($\hat{\sigma}$ = `r sprintf("%.0f", summary(modelo)$sigma)` euros)
 -   **R² múltiple** (`r round(summary(modelo)$r.squared, 4)`) -
     proporción de varianza explicada
 -   **Estadístico F global** para contrastar la significancia del modelo
