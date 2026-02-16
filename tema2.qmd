@@ -203,8 +203,6 @@ $$\hat{\boldsymbol{\beta}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}
 Esta compacta y poderosa ecuación es la base de la estimación en
 regresión lineal y es implementada por todo el software estadístico.
 
-Claro, aquí tienes el texto completo en formato Markdown y con las
-fórmulas clave sin los recuadros.
 
 ### Propiedades de los estimadores de MCO
 

@@ -1,0 +1,469 @@
+---
+title: "Regresión lineal simple"
+---
+
+Arriba del todo cargamos todas las librerías:
+```{r}
+# Librerías
+library(ggplot2)
+```
+
+
+# ¿Qué objetivos tenemos?
+
+ - Entender los datos
+ - Observar y evaluar si existe una relación lineal entre $x$ e $y$
+ - En caso afirmativo, ajustaremos una recta de regresión lineal $$\hat{y}=\hat{\beta}_0 + \hat{\beta}_1 x_i$$ 
+    Como ajuste del modelo teórico: $$Y = \beta_0 + \beta_1 X + \varepsilon$$
+ - Interpretar los coeficientes y su significancia estadística
+ - Diagnosis del modelo
+ - Realizar predicciones
+ 
+
+## Datos simulados Normales
+```{r}
+set.seed(456)
+n <- 100
+x <- rnorm(n,mean = 10, sd = 2)
+y <- 3 + 2*x + rnorm(n, mean = 0, sd = 1.5)
+
+# Juntamos en un df
+datos <- data.frame(x=x,y=y)
+head(datos)
+```
+### Estudiamos si existe relación lineal entre $x$ e $y$
+```{r}
+plot(x,y, main='Diagrama de dispersión entre x e y')
+```
+
+### Ajustamos un modelo de regresión lineal simple
+Para ello, vamos a utilizar la librería 
+
+```{r}
+modelo <- lm(y~x,data = datos) # y~.
+modelo
+```
+Sacamos más información sobre el modelo ajustado:
+```{r}
+summary(modelo)
+```
+### Interpretación de los resultados
+
+Entonces, la recta de regresión que hemos ajustado es:
+$$\hat{y}_i = 2.95 + 1.99 x_i,\  \forall i = 1,\dots,n$$
+
+```{r}
+# Coeficientes
+coeficientes <- coef(modelo)
+cat('Intercept beta0 es ', round(coeficientes[1],2),'\n')
+cat('El valor de la pendiente beta1 es ', round(coeficientes[2],2),'\n')
+```
+El valor del intercept `r round(coeficientes[1],2)`.
+
+La interpretación de los valores ajustados:
+
+  - Cuando $x=0$, el valor esperado de $y$ es `r round(coeficientes[1],2)`.
+  - Por cada unidad que aumenta $x$, $y$ aumenta en promedio `r round(coeficientes[2],2)`
+  
+Vamos a obtener también los intervalos de confianza de los parámetros $\beta$.
+```{r}
+ic <- confint(modelo)
+ic
+```
+
+El intervalo de confianza, al 95%, del parámetro $\hat{\beta}_0$ es [`r round(ic[1,1],3)`, `r round(ic[1,2],3)`]. Del mismo modo, el intervalo de confianza, al 95%, del parámetro $\hat{\beta}_1$ es [`r round(ic[2,1],3)`, `r round(ic[2,2],3)`].
+
+
+
+```{r}
+r2 <- summary(modelo)$r.squared
+```
+
+El valor del $R^2$ es `r round(r2,3)`, esto quiere decir que el modelo explica un `r round(r2,3)*100`% de la variabilidad de $y$.
+
+
+### Diagnosis del modelo
+
+ - Varianza constante (homocedasticidad)
+ - La media de los residuos es 0
+ - Distribución Normal de los residuos
+ - No exista correlación entre los residuos
+ - Linealidad
+ - Estudio valores atípicos, influyentes
+ 
+Ejecutando `plot(modelo)` nos salen 4 gráficos para analizar los residuos.
+```{r}
+plot(modelo)
+```
+
+
+Completamos el estudio de diagnóstico del modelo haciendo un histograma de los residuos y estudiando la incorrelación de los residuos.
+```{r}
+res <- residuals(modelo) # sacamos los residuos del modelo
+hist(res, breaks=20)
+```
+Para analizar la independencia de los residuos, hacemos un plot que enfrente los residuos con el orden (1,2,3,etc.)
+```{r}
+orden <- 1:100
+d2 <- data.frame(orden,res)
+head(d2)
+```
+Ya tenemos construido un dataframe con la información necesaria, ahora graficamos el plot:
+```{r}
+plot(d2$orden,d2$res, type='b')
+abline(h=0,col = 'red')
+```
+
+Vamos a sacar valores numéricos de influencia:
+
+```{r}
+dffits(modelo)
+cooks.distance(modelo)
+hatvalues(modelo)# leverage
+```
+
+
+# Datos reales: Relación peso y consumo de combustible
+
+**OJO: LO PRIMERO SIEMPRE ES DIVIDIR EN TRAIN-TEST-VALIDACIÓN, EN ESTE CASO NO LO HACEMOS PORQUE ES UN EJEMPLO DE JUGUETE PARA ENTENDERLO.**
+
+Estamos interesados en estudiar la relación lineal entre el peso (wt) y las millas por galón (mpg).
+
+```{r}
+data(mtcars)
+df <- mtcars
+head(df)
+```
+
+## Análisis exploratorio
+Hacemos un scatterplot que enfrente ambas variables
+
+```{r}
+ggplot(df,aes(x=wt,y=mpg))+ geom_point(size=3, alpha=0.7)
+```
+
+Estudiamos también la correlación lineal:
+```{r}
+cor(df$wt,df$mpg)
+```
+
+
+## Ajuste del modelo
+```{r}
+modelo_mpg <- lm(mpg ~ wt, data=df)
+summary(modelo_mpg)
+```
+
+
+La recta ajustada: mpg = 37.2851 - 5.3445 wt
+
+## Visualización del modelo ajustado
+```{r}
+# Gráfico con línea de regresión y bandas de confianza
+ggplot(df, aes(x = wt, y = mpg)) +
+  geom_point(size = 3, alpha = 0.7, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red", fill = "pink", alpha = 0.3) +
+  labs(title = "Modelo de Regresión: MPG vs Peso",
+       x = "Peso (1000 lbs)",
+       y = "Millas por Galón") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 14, face = "bold"))
+```
+
+## Diagnóstico del modelo
+
+### Linealidad
+```{r}
+# Extraer residuos y valores ajustados
+datos_diagnostico <- data.frame(
+  residuos = residuals(modelo_mpg),
+  valores_ajustados = fitted(modelo_mpg)
+)
+
+# Gráfico de Residuos vs. Valores Ajustados con ggplot2
+ggplot(datos_diagnostico, aes(x = valores_ajustados, y = residuos)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 0.8, formula = y ~ x) +
+  labs(
+    title = "Residuos vs. Valores Ajustados",
+    x = "Valores Ajustados",
+    y = "Residuos"
+  ) +
+  theme_classic(base_size = 12)
+```
+
+Hacemos el test asociado:
+```{r}
+suppressPackageStartupMessages(library(lmtest))
+# Test RESET para el modelo correcto (horas de estudio)
+reset_resultado <- resettest(modelo_mpg, power = 2:3, type = "fitted")
+print(reset_resultado)
+```
+Dado que el p-valor es <0.05 (95% de confianza), existen evidencias para rechazar la hipótesis nula de que la relación sea lineal.
+
+
+### Homocedasticidad
+```{r}
+# Crear datos para el gráfico Scale-Location
+datos_scale_loc <- data.frame(
+  valores_ajustados = fitted(modelo_mpg),
+  residuos_std_sqrt = sqrt(abs(rstandard(modelo_mpg)))
+)
+
+# Gráfico Scale-Location con ggplot2
+ggplot(datos_scale_loc, aes(x = valores_ajustados, y = residuos_std_sqrt)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 0.8, formula = y ~ x) +
+  labs(
+    title = "Scale-Location",
+    x = "Valores Ajustados",
+    y = expression(sqrt("|Residuos Estandarizados|"))
+  ) +
+  theme_classic(base_size = 12)
+
+# Prueba de Breusch-Pagan
+suppressPackageStartupMessages(library(lmtest))
+bp_resultado <- bptest(modelo_mpg)
+print(bp_resultado)
+
+
+```
+
+El p-valor indica que no existen evidencias estadísticas significativas para rechazar la H0 de homocedasticidad.
+
+
+### Normalidad de los residuos
+```{r}
+# Crear datos para los gráficos
+residuos <- residuals(modelo_mpg)
+
+# 1. Gráfico Q-Q con ggplot2
+datos_qq <- data.frame(residuos = residuos)
+
+p1 <- ggplot(datos_qq, aes(sample = residuos)) +
+  geom_qq(color = "#0072B2", alpha = 0.7) +
+  geom_qq_line(color = "red", linetype = "dashed") +
+  labs(
+    title = "Normal Q-Q Plot",
+    x = "Cuantiles Teóricos",
+    y = "Cuantiles de la Muestra"
+  ) +
+  theme_classic(base_size = 10)
+
+# 2. Histograma con ggplot2
+datos_hist <- data.frame(residuos = residuos)
+
+p2 <- ggplot(datos_hist, aes(x = residuos)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15, fill = "lightblue", 
+                 color = "black", alpha = 0.7) +
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(residuos), sd = sd(residuos)),
+                color = "red", linewidth = 1) +
+  labs(
+    title = "Histograma de Residuos",
+    x = "Residuos",
+    y = "Densidad"
+  ) +
+  theme_classic(base_size = 10)
+
+# 3. Mostrar ambos gráficos lado a lado
+library(gridExtra)
+grid.arrange(p1, p2, ncol = 2)
+
+# Prueba de Shapiro-Wilk
+suppressPackageStartupMessages(library(lmtest))
+shapiro_resultado <- shapiro.test(residuals(modelo_mpg))
+print(shapiro_resultado)
+
+# Prueba de Jarque-Bera
+suppressPackageStartupMessages(library(tseries))
+jb_resultado <- jarque.bera.test(residuals(modelo_mpg))
+print(jb_resultado)
+```
+
+Tanto los p-valores como los gráficos nos indicarían que no existen evidencias para rechazar la hipótesis nula de normalidad.
+
+### Independencia de los residuos
+
+```{r}
+# Gráfico de residuos vs orden de observación con ggplot2
+datos_orden <- data.frame(
+  orden = 1:length(residuals(modelo_mpg)),
+  residuos = residuals(modelo_mpg)
+)
+
+ggplot(datos_orden, aes(x = orden, y = residuos)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_line(color = "#0072B2", alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(
+    title = "Residuos vs Orden de Observación",
+    x = "Orden de observación",
+    y = "Residuos"
+  ) +
+  theme_classic(base_size = 12)
+
+# Prueba de Durbin-Watson
+suppressPackageStartupMessages(library(lmtest))
+dw_resultado_valido <- dwtest(modelo_mpg)
+print(dw_resultado_valido)
+
+# Prueba de Breusch-Godfrey (más general)
+bg_resultado <- bgtest(modelo_mpg, order = 2)
+print(bg_resultado)
+```
+### Influencia
+
+```{r}
+# Crear datos para el gráfico Residuals vs. Leverage
+leverage_vals <- hatvalues(modelo_mpg)
+residuos_stud <- rstudent(modelo_mpg)  # Residuos estudentizados
+cook_dist <- cooks.distance(modelo_mpg)
+
+datos_leverage <- data.frame(
+  leverage = leverage_vals,
+  residuos_stud = residuos_stud,
+  cook = cook_dist,
+  observacion = 1:length(leverage_vals)
+)
+
+# Calcular umbrales
+n <- nrow(datos)
+k <- 1
+leverage_threshold <- 2 * (k + 1) / n
+cook_threshold <- 4 / (n - k - 1)
+
+# Función para crear curvas de Cook
+cook_curve <- function(leverage, cook_value, k) {
+  sqrt(cook_value * (k + 1) * (1 - leverage) / leverage)
+}
+
+# Crear curvas de Cook para diferentes valores
+lev_seq <- seq(0.001, max(leverage_vals) * 1.1, length.out = 100)
+cook_05 <- data.frame(
+  leverage = lev_seq,
+  pos = cook_curve(lev_seq, 0.5, k),
+  neg = -cook_curve(lev_seq, 0.5, k)
+)
+cook_1 <- data.frame(
+  leverage = lev_seq,
+  pos = cook_curve(lev_seq, 1, k),
+  neg = -cook_curve(lev_seq, 1, k)
+)
+
+# Gráfico Residuals vs. Leverage con ggplot2
+ggplot(datos_leverage, aes(x = leverage, y = residuos_stud)) +
+  # Curvas de Cook
+  geom_line(data = cook_05, aes(x = leverage, y = pos), 
+            color = "red", linetype = "dashed", alpha = 0.6, inherit.aes = FALSE) +
+  geom_line(data = cook_05, aes(x = leverage, y = neg), 
+            color = "red", linetype = "dashed", alpha = 0.6, inherit.aes = FALSE) +
+  geom_line(data = cook_1, aes(x = leverage, y = pos), 
+            color = "red", linetype = "solid", alpha = 0.8, inherit.aes = FALSE) +
+  geom_line(data = cook_1, aes(x = leverage, y = neg), 
+            color = "red", linetype = "solid", alpha = 0.8, inherit.aes = FALSE) +
+  # Puntos de datos
+  geom_point(color = "#0072B2", alpha = 0.7, size = 2) +
+  # Líneas de referencia
+  geom_hline(yintercept = 0, color = "gray", linetype = "dashed") +
+  geom_hline(yintercept = c(-2, 2), color = "orange", linetype = "dotted", alpha = 0.7) +
+  geom_vline(xintercept = leverage_threshold, color = "purple", linetype = "dotted", alpha = 0.7) +
+  # Etiquetas
+  labs(
+    title = "Residuals vs. Leverage",
+    x = "Leverage",
+    y = "Residuos Estudentizados",
+    caption = "Curvas rojas: Cook 0.5 (discontinua) y 1.0 (continua) | Líneas naranjas: ±2 | Línea morada: umbral leverage"
+  ) +
+  theme_classic(base_size = 12)
+
+# Identificar observaciones problemáticas
+high_leverage <- which(leverage_vals > leverage_threshold)
+outliers_stud <- which(abs(residuos_stud) > 2)
+high_cook <- which(cook_dist > cook_threshold)
+```
+
+
+
+```{r}
+# Preparar todos los datos necesarios para los gráficos
+residuos_completo <- residuals(modelo_mpg)
+valores_ajustados_completo <- fitted(modelo_mpg)
+residuos_std <- rstandard(modelo_mpg)
+leverage_vals <- hatvalues(modelo_mpg)
+
+# 1. Gráfico Residuos vs. Valores Ajustados
+p1_completo <- ggplot(data.frame(x = valores_ajustados_completo, y = residuos_completo), 
+                      aes(x = x, y = y)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 0.8, formula = y ~ x) +
+  labs(title = "Residuos vs. Valores Ajustados", x = "Valores Ajustados", y = "Residuos") +
+  theme_classic(base_size = 10)
+
+# 2. Gráfico Q-Q Normal
+datos_qq_completo <- data.frame(residuos = residuos_std)
+
+p2_completo <- ggplot(datos_qq_completo, aes(sample = residuos)) +
+  geom_qq(color = "#0072B2", alpha = 0.7) +
+  geom_qq_line(color = "red", linetype = "dashed") +
+  labs(title = "Normal Q-Q Plot", x = "Cuantiles Teóricos", y = "Cuantiles de la Muestra") +
+  theme_classic(base_size = 10)
+
+# 3. Gráfico Scale-Location
+p3_completo <- ggplot(data.frame(x = valores_ajustados_completo, 
+                                 y = sqrt(abs(residuos_std))), 
+                      aes(x = x, y = y)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linewidth = 0.8, formula = y ~ x) +
+  labs(title = "Scale-Location", x = "Valores Ajustados", 
+       y = expression(sqrt("|Residuos Estandarizados|"))) +
+  theme_classic(base_size = 10)
+
+# 4. Gráfico Residuos vs. Leverage (con curvas de Cook)
+p4_completo <- ggplot(datos_leverage, aes(x = leverage, y = residuos_stud)) +
+  # Curvas de Cook
+  geom_line(data = cook_05, aes(x = leverage, y = pos), 
+            color = "red", linetype = "dashed", alpha = 0.6, inherit.aes = FALSE) +
+  geom_line(data = cook_05, aes(x = leverage, y = neg), 
+            color = "red", linetype = "dashed", alpha = 0.6, inherit.aes = FALSE) +
+  geom_line(data = cook_1, aes(x = leverage, y = pos), 
+            color = "red", linetype = "solid", alpha = 0.8, inherit.aes = FALSE) +
+  geom_line(data = cook_1, aes(x = leverage, y = neg), 
+            color = "red", linetype = "solid", alpha = 0.8, inherit.aes = FALSE) +
+  # Puntos de datos
+  geom_point(color = "#0072B2", alpha = 0.7, size = 1.5) +
+  # Líneas de referencia
+  geom_hline(yintercept = 0, color = "gray", linetype = "dashed") +
+  geom_hline(yintercept = c(-2, 2), color = "orange", linetype = "dotted", alpha = 0.7) +
+  geom_vline(xintercept = leverage_threshold, color = "purple", linetype = "dotted", alpha = 0.7) +
+  labs(title = "Residuals vs. Leverage", x = "Leverage", y = "Residuos Estudentizados") +
+  theme_classic(base_size = 10)
+
+# 5. Histograma de residuos
+p5_completo <- ggplot(data.frame(residuos = residuos_completo), aes(x = residuos)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15, fill = "lightblue", 
+                 color = "black", alpha = 0.7) +
+  stat_function(fun = dnorm, 
+                args = list(mean = mean(residuos_completo), sd = sd(residuos_completo)),
+                color = "red", linewidth = 1) +
+  labs(title = "Histograma de Residuos", x = "Residuos", y = "Densidad") +
+  theme_classic(base_size = 10)
+
+# 6. Residuos vs. Orden
+p6_completo <- ggplot(data.frame(orden = 1:length(residuos_completo), 
+                                 residuos = residuos_completo), 
+                      aes(x = orden, y = residuos)) +
+  geom_point(color = "#0072B2", alpha = 0.7) +
+  geom_line(color = "#0072B2", alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuos vs. Orden", x = "Orden de observación", y = "Residuos") +
+  theme_classic(base_size = 10)
+
+# Mostrar todos los gráficos en una rejilla 2x3
+library(gridExtra)
+grid.arrange(p1_completo, p2_completo, p3_completo, 
+             p4_completo, p5_completo, p6_completo, ncol = 3)
+```
+
