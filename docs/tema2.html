@@ -548,10 +548,10 @@ Interpretación práctica de los coeficientes
 <p>Volviendo a nuestro ejemplo de viviendas, interpretemos cada coeficiente aplicando el principio <em>ceteris paribus</em>:</p>
 <ul>
 <li><p><strong>Superficie</strong> (1172 €/m²): Por cada metro cuadrado adicional, el precio aumenta en promedio 1172 euros, <strong>manteniendo constantes</strong> el número de habitaciones, antigüedad, distancia al centro y presencia de garaje.</p></li>
-<li><p><strong>Habitaciones</strong> (1.5072^{4} €): Cada habitación adicional incrementa el precio en 1.5072^{4} euros en promedio, <strong>controlando por</strong> la superficie y demás variables.</p></li>
+<li><p><strong>Habitaciones</strong> (15072 €): Cada habitación adicional incrementa el precio en 15072 euros en promedio, <strong>controlando por</strong> la superficie y demás variables.</p></li>
 <li><p><strong>Antigüedad</strong> (-745 €/año): Por cada año de antigüedad, el precio disminuye en 745 euros en promedio, <strong>ceteris paribus</strong>.</p></li>
 <li><p><strong>Distancia al centro</strong> (-2028 €/km): Cada kilómetro adicional de distancia reduce el precio en 2028 euros en promedio, <strong>manteniendo todo lo demás constante</strong>.</p></li>
-<li><p><strong>Garaje</strong> (2.5829^{4} €): Las viviendas con garaje cuestan 2.5829^{4} euros más que las que no tienen, <strong>en promedio y controlando por las demás variables</strong>.</p></li>
+<li><p><strong>Garaje</strong> (25829 €): Las viviendas con garaje cuestan 25829 euros más que las que no tienen, <strong>en promedio y controlando por las demás variables</strong>.</p></li>
 </ul>
 <p><strong>Punto clave</strong>: Estos efectos son diferentes de los que obtendríamos con regresiones simples, ya que aquí hemos “limpiado” la influencia de las otras variables.</p>
 </div>
@@ -575,6 +575,7 @@ La perspectiva geométrica de mínimos cuadrados
 <p>Esta operación induce la <strong>descomposición ortogonal fundamental</strong> del vector de respuesta:</p>
 <p><span class="math display">\[\mathbf{y} = \hat{\mathbf{y}} + \mathbf{e}\]</span></p>
 <p>El hecho de que la proyección sea ortogonal implica que el vector de residuos <span class="math inline">\(\mathbf{e}\)</span> es ortogonal (perpendicular) al vector de valores ajustados <span class="math inline">\(\hat{\mathbf{y}}\)</span> y, de hecho, a todo el subespacio <span class="math inline">\(C(\mathbf{X})\)</span>. Esta ortogonalidad, <span class="math inline">\(\hat{\mathbf{y}}^T\mathbf{e}=0\)</span>, es la base del <strong>Teorema de Pitágoras para la regresión</strong>, que permite la descomposición de la variabilidad total en una parte explicada y una no explicada.</p>
+<p>De todo esto, también extraemos que <span class="math inline">\(\mathbf{e}\)</span> es perpendicular a todo el subespacio <span class="math inline">\(C(\mathbf{X})\)</span>. Luego, <span class="math inline">\(\mathbf{X}^T\mathbf{e}=0\)</span>, es decir, los residuos quedan descorrelacionados con cada predictor.</p>
 </div>
 </div>
 </section>
@@ -594,7 +595,6 @@ La perspectiva geométrica de mínimos cuadrados
 <li><strong>SSR (Suma de Cuadrados de la Regresión)</strong>: Es la variabilidad <strong>explicada</strong> por el modelo. Mide la dispersión de los valores predichos alrededor de la media.</li>
 <li><strong>SSE (Suma de Cuadrados del Error)</strong>: Es la variabilidad <strong>no explicada</strong> o residual. Mide la dispersión de los datos observados alrededor de la línea de regresión.</li>
 </ul>
-<p>Esta tabla no es solo un resumen; es el motor de las principales herramientas de evaluación e inferencia del modelo.</p>
 <section id="coeficiente-de-determinación-múltiple" class="level3" data-number="3.4.1">
 <h3 data-number="3.4.1" class="anchored" data-anchor-id="coeficiente-de-determinación-múltiple"><span class="header-section-number">3.4.1</span> Coeficiente de determinación múltiple</h3>
 <p>El <strong>coeficiente de determinación</strong>, <span class="math inline">\(R^2\)</span>, es la medida de ajuste más popular. Responde a la pregunta: <em>¿Qué proporción de la variabilidad total de Y es explicada por las variables predictoras del modelo?</em></p>
@@ -611,9 +611,6 @@ La perspectiva geométrica de mínimos cuadrados
 <p>Para solucionar el problema de <span class="math inline">\(R^2\)</span>, utilizamos el <span class="math inline">\(R^2\)</span> ajustado, que introduce una penalización por cada variable añadida. Lo hace comparando las varianzas (sumas de cuadrados divididas por sus grados de libertad) en lugar de solo las sumas de cuadrados:</p>
 <p><span class="math display">\[R^2_{adj} = 1 - \frac{SSE/(n-p-1)}{SST/(n-1)} = 1 - \frac{\hat{\sigma}^2}{s_Y^2}\]</span></p>
 <p>Donde <span class="math inline">\(s_Y^2\)</span> es la varianza muestral de <span class="math inline">\(Y\)</span>. El <span class="math inline">\(R^2_{ajustado}\)</span> solo aumentará si la nueva variable mejora el modelo más de lo que se esperaría por puro azar. Es, por tanto, la métrica preferida para comparar la calidad de ajuste de modelos anidados.</p>
-<p>¡Excelente observación! Tienes toda la razón. En la sección de “Inferencia” me centré en los contrastes de hipótesis (el test t y el test F) pero omití una parte igualmente importante que sí estaba en tu Tema 1: la <strong>construcción de intervalos de confianza para los parámetros</strong>.</p>
-<p>Un contraste de hipótesis te da una respuesta de “sí/no” sobre la significancia, pero un intervalo de confianza te ofrece un rango de valores plausibles para el efecto, lo cual es mucho más informativo.</p>
-<p>Aquí tienes una versión revisada y ampliada de la sección <strong>“Inferencia estadística en el modelo múltiple”</strong> que incluye explícitamente los intervalos de confianza, manteniendo el flujo que hemos construido. Puedes reemplazar la sección anterior por esta.</p>
 </section>
 </section>
 <section id="inferencia-estadística-en-el-modelo-múltiple" class="level2" data-number="3.5">
