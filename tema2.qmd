@@ -250,6 +250,8 @@ Estimadores Lineales Insesgados (MELI o BLUE)**. Desglosemos esto:
     cada coeficiente individual, $Var(\hat{\beta}_j)$, mientras que los
     elementos fuera de la diagonal nos dan la covarianza entre pares de
     coeficientes, $Cov(\hat{\beta}_j, \hat{\beta}_k)$.
+    
+
 
 Finalmente, si añadimos el **supuesto de normalidad de los errores**
 ($\varepsilon_i \sim N(0, \sigma^2)$), las propiedades del estimador se
