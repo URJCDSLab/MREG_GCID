@@ -821,9 +821,7 @@ predictor** $X_j$, ajustando por el efecto de todos los demás
 predictores. Para cada predictor $X_j$, el gráfico muestra:
 
 $$\text{Residuo Parcial} = e_i + \hat{\beta}_j x_{ij} \quad \text{vs.} \quad x_{ij}$$
-
-La pendiente de una línea ajustada a estos puntos es exactamente
-$\hat{\beta}_j$. Si la relación es lineal, los puntos deben seguir la
+ Si la relación es lineal, los puntos deben seguir la
 línea de regresión. Una desviación sistemática (una curva) sugiere que
 la relación con esa variable específica no es lineal y que podría
 necesitar una transformación (p.ej., logarítmica o cuadrática).
