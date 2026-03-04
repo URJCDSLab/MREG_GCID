@@ -831,6 +831,75 @@ Extensión: Transformación de Yeo-Johnson
 <p>La elección entre ambas depende fundamentalmente de las características de sus datos y los objetivos del análisis.</p>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled" title="Extensión: Box-Cox">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Extensión: Box-Cox
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>La transformación de Box-Cox se justifica suponiendo que, una vez transformados, los datos pueden modelarse aproximadamente como normales con varianza constante. Si <span class="math inline">\(x_i&gt;0\)</span>, la transformación se define por</p>
+<p><span class="math display">\[y_i(\lambda)=
+\begin{cases}
+\dfrac{x_i^\lambda-1}{\lambda}, &amp; \lambda\neq 0, \\[6pt]
+\log x_i, &amp; \lambda=0.
+\end{cases}\]</span></p>
+<p>Bajo esta transformación, se asume que las variables transformadas <span class="math inline">\(y_i(\lambda)\)</span> son independientes y siguen una distribución normal <span class="math inline">\(\mathcal{N}(\mu,\sigma^2)\)</span>. A partir de esa hipótesis, la log-verosimilitud no se obtiene solo a partir de la densidad normal de los <span class="math inline">\(y_i\)</span>, sino que además hay que incorporar el cambio de variable desde los datos originales <span class="math inline">\(x_i\)</span> a los datos transformados <span class="math inline">\(y_i\)</span>. Por eso aparece un término adicional asociado al jacobiano de la transformación.</p>
+<p>La log-verosimilitud conjunta queda entonces</p>
+<p><span class="math display">\[
+\ell(\mu,\sigma^2,\lambda)
+=
+-\frac n2\log(2\pi)
+-\frac n2\log(\sigma^2)
+-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i-\mu)^2
++\log|J(\lambda)|.
+\]</span> En el caso de Box-Cox, la derivada de la transformación respecto de <span class="math inline">\(x_i\)</span> es</p>
+<p><span class="math display">\[
+\frac{dy_i}{dx_i}=x_i^{\lambda-1},
+\]</span></p>
+<p>de modo que el jacobiano total es el producto de esas derivadas:</p>
+<p><span class="math display">\[
+J(\lambda)=\prod_{i=1}^n x_i^{\lambda-1}.
+\]</span></p>
+<p>Al tomar logaritmos, ese término se convierte en</p>
+<p><span class="math display">\[
+\log|J(\lambda)|
+=
+(\lambda-1)\sum_{i=1}^n \log x_i.
+\]</span></p>
+<p>Sustituyendo este resultado en la expresión anterior, la log-verosimilitud puede escribirse como</p>
+<p><span class="math display">\[
+\ell(\mu,\sigma^2,\lambda)
+=
+-\frac n2\log(2\pi)
+-\frac n2\log(\sigma^2)
+-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i-\mu)^2
++
+(\lambda-1)\sum_{i=1}^n \log x_i.
+\]</span></p>
+<p>Para elegir <span class="math inline">\(\lambda\)</span>, no suele interesar estimar simultáneamente <span class="math inline">\(\mu\)</span> y <span class="math inline">\(\sigma^2\)</span>, sino eliminarlos sustituyéndolos por sus estimadores de máxima verosimilitud para cada valor fijo de <span class="math inline">\(\lambda\)</span>. En este caso,</p>
+<p><span class="math display">\[
+\hat\mu=\bar y,
+\qquad
+\hat\sigma^2=\frac1n\sum_{i=1}^n (y_i-\bar y)^2.
+\]</span></p>
+<p>Al reemplazar estos estimadores en la log-verosimilitud y omitir los términos constantes que no dependen de <span class="math inline">\(\lambda\)</span>, se obtiene la log-verosimilitud perfilada:</p>
+<p><span class="math display">\[
+\ell_p(\lambda)
+=
+(\lambda-1)\sum_{i=1}^n \log x_i
+-
+\frac n2\log\!\left(\frac1n\sum_{i=1}^n (y_i-\bar y)^2\right).
+\]</span></p>
+<p>Esta es la expresión que se maximiza para seleccionar el valor de <span class="math inline">\(\lambda\)</span>. En consecuencia, la transformación de Box-Cox se apoya en una verosimilitud normal aplicada a los datos transformados, corregida por el jacobiano del cambio de variable, y el parámetro de transformación se escoge maximizando esa verosimilitud perfilada.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="tratamiento-de-variables-categóricas" class="level2" data-number="4.5">
@@ -918,7 +987,7 @@ Dummy Variable Trap
 <p>Cada observación queda representada por un vector binario que identifica unívocamente su categoría sin asumir relaciones ordinales entre colores.</p>
 <p><strong>Interpretación en regresión:</strong> En un modelo de regresión lineal, cada variable binaria creada tendrá su propio coeficiente que representa la diferencia en la variable respuesta entre esa categoría específica y la categoría de referencia (la omitida). Por ejemplo, si omitimos “Azul”, el coeficiente de “Color_Rojo” indicará cuánto mayor (o menor) es el valor esperado de Y cuando el color es Rojo comparado con cuando es Azul.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Implementación práctica">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -927,7 +996,7 @@ Implementación práctica
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear datos de ejemplo</span></span>
@@ -1003,7 +1072,7 @@ Ventajas y desventajas
 </ul>
 <p><strong>Desventajas:</strong></p>
 <ul>
-<li><strong>Dimensionalidad</strong>: Crea k columnas para k categorías (o k-1 con categoría de referencia)</li>
+<li><strong>Dimensionalidad</strong>: Crea <span class="math inline">\(k\)</span> columnas para <span class="math inline">\(k\)</span> categorías (o <span class="math inline">\(k-1\)</span> con categoría de referencia)</li>
 <li><strong>Dispersión</strong>: Matrices resultantes son muy dispersas (muchos ceros)</li>
 <li><strong>Colinealidad</strong>: Riesgo de “dummy variable trap” sin categoría de referencia</li>
 </ul>
@@ -1012,7 +1081,7 @@ Ventajas y desventajas
 </section>
 <section id="codificación-ordinal-variables-ordinales" class="level3" data-number="4.5.3">
 <h3 data-number="4.5.3" class="anchored" data-anchor-id="codificación-ordinal-variables-ordinales"><span class="header-section-number">4.5.3</span> Codificación Ordinal (variables ordinales)</h3>
-<p>La <strong>codificación ordinal</strong> transforma variables categóricas ordinales en números enteros que preservan el orden jerárquico natural de las categorías. Esta técnica es fundamental cuando trabajamos with variables categóricas que tienen un orden inherente y significativo, como nivel educativo, satisfacción del cliente, grado de severidad, o calificaciones de crédito.</p>
+<p>La <strong>codificación ordinal</strong> transforma variables categóricas ordinales en números enteros que preservan el orden jerárquico natural de las categorías. Esta técnica es fundamental cuando trabajamos con variables categóricas que tienen un orden inherente y significativo, como nivel educativo, satisfacción del cliente, grado de severidad, o calificaciones de crédito.</p>
 <p>La transformación asigna números enteros consecutivos que reflejan la jerarquía natural de las categorías, preservando tanto la información categórica como el orden relativo entre ellas.</p>
 <div class="callout callout-style-default callout-warning callout-titled" title="Cuándo usar codificación ordinal">
 <div class="callout-header d-flex align-content-center">
@@ -1068,7 +1137,7 @@ Cuándo usar codificación ordinal
 <p>Cada observación queda representada por un número entero que preserva el orden jerárquico de las categorías originales.</p>
 <p><strong>Interpretación en regresión:</strong> En un modelo de regresión lineal, el coeficiente de la variable ordinal codificada representa el cambio promedio en la variable respuesta por cada incremento de una unidad en el nivel ordinal. Por ejemplo, si el coeficiente es 2.5, esto significa que pasar del nivel 1 al 2, o del 3 al 4, se asocia en promedio con un aumento de 2.5 unidades en la variable respuesta, asumiendo intervalos uniformes entre niveles.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Implementación práctica">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1077,7 +1146,7 @@ Implementación práctica
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear datos de ejemplo</span></span>
@@ -1163,6 +1232,22 @@ Ventajas y desventajas
 </ul>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled" title="Más info">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Más info
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><a href="https://library.virginia.edu/data/articles/understanding-ordered-factors-in-a-linear-model">Understanding ordered factors in a linear model</a></p>
+</div>
+</div>
+</div>
 </section>
 <section id="comparación-directa-ordinal-vs-one-hot-encoding" class="level3" data-number="4.5.4">
 <h3 data-number="4.5.4" class="anchored" data-anchor-id="comparación-directa-ordinal-vs-one-hot-encoding"><span class="header-section-number">4.5.4</span> Comparación directa: Ordinal vs One-Hot Encoding</h3>
@@ -1245,11 +1330,11 @@ Principios para feature engineering efectivo
 <p><strong>Interpretación del coeficiente de interacción</strong> (<span class="math inline">\(\beta_3\)</span>):</p>
 <ul>
 <li>Si <span class="math inline">\(\beta_3 &gt; 0\)</span>: El efecto de <span class="math inline">\(X_1\)</span> se amplifica cuando <span class="math inline">\(X_2\)</span> aumenta</li>
-<li>Si $_3 &lt; 0: El efecto de <span class="math inline">\(X_1\)</span> se atenúa cuando <span class="math inline">\(X_2\)</span> aumenta</li>
+<li>Si <span class="math inline">\(\beta_3 &lt; 0\)</span>: El efecto de <span class="math inline">\(X_1\)</span> se atenúa cuando <span class="math inline">\(X_2\)</span> aumenta</li>
 <li>Si <span class="math inline">\(\beta_3 = 0\)</span>: No hay interacción (efectos aditivos)</li>
 </ul>
 <div class="callout callout-style-default callout-tip callout-titled" title="Ejemplo: Interacción precio-publicidad en ventas">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1258,7 +1343,7 @@ Ejemplo: Interacción precio-publicidad en ventas
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulación: efecto de precio y publicidad en ventas</span></span>
@@ -1410,7 +1495,7 @@ F-statistic:  1291 on 3 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Donde <span class="math inline">\((\alpha\beta)_{ij}\)</span> representa la interacción específica entre el nivel i de A y el nivel j de B.</p>
 <p>La interacción <span class="math inline">\((\alpha\beta)_{ij}\)</span> indica cuánto la combinación específica (i,j) se desvía del efecto que esperaríamos si solo sumáramos los efectos principales <span class="math inline">\(\alpha_i + \beta_j\)</span>.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Ejemplo: Interacción género-departamento en salarios">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-15-contents" aria-controls="callout-15" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-17-contents" aria-controls="callout-17" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1419,7 +1504,7 @@ Ejemplo: Interacción género-departamento en salarios
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-15" class="callout-15-contents callout-collapse collapse">
+<div id="callout-17" class="callout-17-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulación: salarios por género y departamento con interacción</span></span>
@@ -1653,7 +1738,7 @@ F-statistic: 164.9 on 5 and 294 DF,  p-value: &lt; 2.2e-16</code></pre>
 <li><strong>Pendiente diferente</strong>: <span class="math inline">\(\beta_1\)</span> (grupo de referencia) vs.&nbsp;<span class="math inline">\(\beta_1 + \beta_3\)</span> (otro grupo)</li>
 </ul>
 <div class="callout callout-style-default callout-tip callout-titled" title="Ejemplo: Interacción experiencia-género en salarios">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-18-contents" aria-controls="callout-18" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -1662,7 +1747,7 @@ Ejemplo: Interacción experiencia-género en salarios
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div id="callout-18" class="callout-18-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulación: efecto de experiencia en salario varía según género</span></span>

@@ -372,6 +372,85 @@ La transformación de Yeo-Johnson [@yeo2000new] fue desarrollada específicament
 La elección entre ambas depende fundamentalmente de las características de sus datos y los objetivos del análisis.
 :::
 
+
+::: {.callout-note title="Extensión: Box-Cox" collapse="true"}
+
+La transformación de Box-Cox se justifica suponiendo que, una vez transformados, los datos pueden modelarse aproximadamente como normales con varianza constante. Si $x_i>0$, la transformación se define por
+
+$$y_i(\lambda)=
+\begin{cases}
+\dfrac{x_i^\lambda-1}{\lambda}, & \lambda\neq 0, \\[6pt]
+\log x_i, & \lambda=0.
+\end{cases}$$
+
+Bajo esta transformación, se asume que las variables transformadas $y_i(\lambda)$ son independientes y siguen una distribución normal $\mathcal{N}(\mu,\sigma^2)$. A partir de esa hipótesis, la log-verosimilitud no se obtiene solo a partir de la densidad normal de los $y_i$, sino que además hay que incorporar el cambio de variable desde los datos originales $x_i$ a los datos transformados $y_i$. Por eso aparece un término adicional asociado al jacobiano de la transformación.
+
+La log-verosimilitud conjunta queda entonces
+
+$$
+\ell(\mu,\sigma^2,\lambda)
+=
+-\frac n2\log(2\pi)
+-\frac n2\log(\sigma^2)
+-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i-\mu)^2
++\log|J(\lambda)|.
+$$
+En el caso de Box-Cox, la derivada de la transformación respecto de $x_i$ es
+
+$$
+\frac{dy_i}{dx_i}=x_i^{\lambda-1},
+$$
+
+de modo que el jacobiano total es el producto de esas derivadas:
+
+$$
+J(\lambda)=\prod_{i=1}^n x_i^{\lambda-1}.
+$$
+
+Al tomar logaritmos, ese término se convierte en
+
+$$
+\log|J(\lambda)|
+=
+(\lambda-1)\sum_{i=1}^n \log x_i.
+$$
+
+Sustituyendo este resultado en la expresión anterior, la log-verosimilitud puede escribirse como
+
+$$
+\ell(\mu,\sigma^2,\lambda)
+=
+-\frac n2\log(2\pi)
+-\frac n2\log(\sigma^2)
+-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i-\mu)^2
++
+(\lambda-1)\sum_{i=1}^n \log x_i.
+$$
+
+Para elegir $\lambda$, no suele interesar estimar simultáneamente $\mu$ y $\sigma^2$, sino eliminarlos sustituyéndolos por sus estimadores de máxima verosimilitud para cada valor fijo de $\lambda$. En este caso,
+
+$$
+\hat\mu=\bar y,
+\qquad
+\hat\sigma^2=\frac1n\sum_{i=1}^n (y_i-\bar y)^2.
+$$
+
+Al reemplazar estos estimadores en la log-verosimilitud y omitir los términos constantes que no dependen de $\lambda$, se obtiene la log-verosimilitud perfilada:
+
+$$
+\ell_p(\lambda)
+=
+(\lambda-1)\sum_{i=1}^n \log x_i
+-
+\frac n2\log\!\left(\frac1n\sum_{i=1}^n (y_i-\bar y)^2\right).
+$$
+
+Esta es la expresión que se maximiza para seleccionar el valor de $\lambda$. En consecuencia, la transformación de Box-Cox se apoya en una verosimilitud normal aplicada a los datos transformados, corregida por el jacobiano del cambio de variable, y el parámetro de transformación se escoge maximizando esa verosimilitud perfilada.
+
+
+:::
+
+
 ## Tratamiento de variables categóricas
 
 Las **variables categóricas** son fundamentales en el modelado estadístico, pero requieren una preparación especial antes de ser utilizadas en algoritmos que esperan entradas numéricas [@potdar2017comparative]. La elección del método de codificación puede impactar significativamente tanto la interpretabilidad como el rendimiento del modelo.
@@ -457,14 +536,14 @@ one_hot_caret
 
 **Desventajas:**
 
-- **Dimensionalidad**: Crea k columnas para k categorías (o k-1 con categoría de referencia)
+- **Dimensionalidad**: Crea $k$ columnas para $k$ categorías (o $k-1$ con categoría de referencia)
 - **Dispersión**: Matrices resultantes son muy dispersas (muchos ceros)
 - **Colinealidad**: Riesgo de "dummy variable trap" sin categoría de referencia
 :::
 
 ### Codificación Ordinal (variables ordinales)
 
-La **codificación ordinal** transforma variables categóricas ordinales en números enteros que preservan el orden jerárquico natural de las categorías. Esta técnica es fundamental cuando trabajamos with variables categóricas que tienen un orden inherente y significativo, como nivel educativo, satisfacción del cliente, grado de severidad, o calificaciones de crédito.
+La **codificación ordinal** transforma variables categóricas ordinales en números enteros que preservan el orden jerárquico natural de las categorías. Esta técnica es fundamental cuando trabajamos con variables categóricas que tienen un orden inherente y significativo, como nivel educativo, satisfacción del cliente, grado de severidad, o calificaciones de crédito.
 
 La transformación asigna números enteros consecutivos que reflejan la jerarquía natural de las categorías, preservando tanto la información categórica como el orden relativo entre ellas.
 
@@ -536,6 +615,13 @@ summary(modelo)
 - **Pérdida de flexibilidad**: No puede capturar relaciones no-lineales entre niveles ordinales
 :::
 
+::: {.callout-note title="Más info" collapse="true"}
+
+[Understanding ordered factors in a linear model](https://library.virginia.edu/data/articles/understanding-ordered-factors-in-a-linear-model)
+:::
+
+
+
 ### Comparación directa: Ordinal vs One-Hot Encoding
 
 La elección entre codificación ordinal y one-hot encoding depende fundamentalmente de la naturaleza de la variable categórica y los objetivos del análisis. Una decisión incorrecta puede llevar a interpretaciones erróneas y modelos subóptimos.
@@ -572,7 +658,7 @@ $$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \varepsilon$$
 **Interpretación del coeficiente de interacción** ($\beta_3$): 
 
 - Si $\beta_3 > 0$: El efecto de $X_1$ se amplifica cuando $X_2$ aumenta 
-- Si $\beta_3 < 0: El efecto de $X_1$ se atenúa cuando $X_2$ aumenta 
+- Si $\beta_3 < 0$: El efecto de $X_1$ se atenúa cuando $X_2$ aumenta 
 - Si $\beta_3 = 0$: No hay interacción (efectos aditivos)
 
 ::: {.callout-tip title="Ejemplo: Interacción precio-publicidad en ventas" collapse="true"}
